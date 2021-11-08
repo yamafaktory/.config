@@ -199,10 +199,10 @@ require('packer').startup(function(use)
 
       local prettierFormatter = function()
         return {
-          exe = 'npx prettier --',
+          exe = 'prettier',
           args = {
             '--stdin-filepath',
-            vim.fn.shellescape(vim.api.nvim_buf_get_name(0)),
+            vim.fn.fnameescape(vim.api.nvim_buf_get_name(0)),
           },
           stdin = true,
         }
@@ -388,6 +388,17 @@ lsp_installer.on_server_ready(function(server)
         },
       },
     }
+  end
+
+  if server.name == 'tsserver' then
+    local lspconfig = require('lspconfig')
+
+    opts.root_dir = lspconfig.util.root_pattern(
+      'yarn.lock',
+      'lerna.json',
+      '.git'
+    )
+    opts.settings = { documentFormatting = true }
   end
 
   -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart).
