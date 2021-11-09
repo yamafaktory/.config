@@ -61,7 +61,7 @@ require('packer').startup(function(use)
     'nvim-lualine/lualine.nvim',
     requires = { 'kyazdani42/nvim-web-devicons', opt = true },
     config = function()
-      require('lualine').setup({ options = { theme = 'rose-pine' } })
+      require('lualine').setup({ options = { theme = 'tokyonight' } })
     end,
   })
 
@@ -136,13 +136,21 @@ require('packer').startup(function(use)
   -- LSP servers installer.
   use('williamboman/nvim-lsp-installer')
 
+  -- Get better LSP diagnostics.
+  use({
+    'folke/trouble.nvim',
+    requires = 'kyazdani42/nvim-web-devicons',
+    config = function()
+      require('trouble').setup({})
+    end,
+  })
+
   -- Current theme.
   use({
-    'rose-pine/neovim',
-    as = 'rose-pine',
+    'folke/tokyonight.nvim',
     config = function()
-      vim.g.rose_pine_variant = 'base'
-      vim.cmd('colorscheme rose-pine')
+      vim.g.tokyonight_style = 'night'
+      vim.cmd('colorscheme tokyonight')
     end,
   })
 
@@ -261,6 +269,9 @@ set_keymap(
   options
 )
 
+-- Trouble.
+set_keymap('n', '<leader>tr', '<cmd>Trouble<cr>', options)
+
 --[[
 -- LSP Setup.
 --]]
@@ -340,6 +351,19 @@ cmp.setup({
     { name = 'npm', keyword_length = 4 },
   }),
 })
+
+-- Use nice icons for diagnostics.
+local signs = {
+  Error = ' ',
+  Warning = ' ',
+  Hint = ' ',
+  Information = ' ',
+}
+
+for type, icon in pairs(signs) do
+  local hl = 'LspDiagnosticsSign' .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
 
 -- Prepare on_attach and capabilities.
 -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
