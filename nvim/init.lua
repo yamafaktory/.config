@@ -259,6 +259,19 @@ set_keymap(
   options
 )
 set_keymap('n', '<Leader>tff', telescope_builtin .. 'find_files()<CR>', options)
+set_keymap('n', '<Leader>tgs', telescope_builtin .. 'git_status()<CR>', options)
+set_keymap(
+  'n',
+  '<Leader>tgc',
+  telescope_builtin .. 'git_commits()<CR>',
+  options
+)
+set_keymap(
+  'n',
+  '<Leader>tgb',
+  telescope_builtin .. 'git_branches()<CR>',
+  options
+)
 
 -- FTerm.
 set_keymap('n', '<A-t>', '<Cmd>lua require("FTerm").toggle()<CR>', options)
