@@ -250,28 +250,29 @@ end)
 
 -- Telescope.
 local telescope_builtin = "<Cmd>lua require('telescope.builtin')."
+local set_telescope_keymap = function(method, leader_key)
+  set_keymap(
+    'n',
+    '<Leader>t' .. leader_key,
+    telescope_builtin .. method .. '<CR>',
+    options
+  )
+end
 
-set_keymap('n', '<Leader>tb', telescope_builtin .. 'buffers()<CR>', options)
-set_keymap(
-  'n',
-  '<Leader>tfb',
-  telescope_builtin .. 'file_browser()<CR>',
-  options
-)
-set_keymap('n', '<Leader>tff', telescope_builtin .. 'find_files()<CR>', options)
-set_keymap('n', '<Leader>tgs', telescope_builtin .. 'git_status()<CR>', options)
-set_keymap(
-  'n',
-  '<Leader>tgc',
-  telescope_builtin .. 'git_commits()<CR>',
-  options
-)
-set_keymap(
-  'n',
-  '<Leader>tgb',
-  telescope_builtin .. 'git_branches()<CR>',
-  options
-)
+local telescope_mapping = {
+  b = 'buffers()',
+  fb = 'file_browser()',
+  ff = 'find_files({ find_command = {"rg", "--files", "--hidden", "-g", "!.git" }})',
+  gb = 'git_branches()',
+  gc = 'git_commits()',
+  gs = 'git_status()',
+  lg = 'live_grep()',
+  lr = 'lsp_references()',
+}
+
+for leader_key, method in pairs(telescope_mapping) do
+  set_telescope_keymap(method, leader_key)
+end
 
 -- FTerm.
 set_keymap('n', '<A-t>', '<Cmd>lua require("FTerm").toggle()<CR>', options)
