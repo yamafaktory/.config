@@ -132,6 +132,8 @@ require('packer').startup(function(use)
       require('cmp-npm').setup({})
     end,
   })
+  use('ray-x/lsp_signature.nvim') -- Live lsp signatures.
+  use('hrsh7th/cmp-emoji') -- Emojis completion.
 
   -- LSP servers installer.
   use('williamboman/nvim-lsp-installer')
@@ -162,7 +164,7 @@ require('packer').startup(function(use)
   use({
     'Saecki/crates.nvim',
     event = { 'BufRead Cargo.toml' },
-    requires = { { 'nvim-lua/plenary.nvim' } },
+    requires = { 'nvim-lua/plenary.nvim' },
     config = function()
       require('crates').setup()
     end,
@@ -361,6 +363,7 @@ cmp.setup({
     { name = 'luasnip' },
     { name = 'buffer' },
     { name = 'path' },
+    { name = 'emoji' },
     { name = 'crates' },
     { name = 'npm', keyword_length = 4 },
   }),
@@ -395,6 +398,10 @@ local on_attach = function(_, bufnr)
   buf_set_keymap('<Leader>s', lsp_buf .. 'signature_help()<CR>', options)
   buf_set_keymap('<Leader>a', lsp_buf .. 'code_action()<CR>', options)
   buf_set_keymap('<Leader>d', lsp_buf .. 'type_definition()<CR>', options)
+
+  require('lsp_signature').on_attach({
+    hint_prefix = '💡',
+  })
 
   -- Format on save.
   vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.formatting_sync()')
