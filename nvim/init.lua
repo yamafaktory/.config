@@ -182,6 +182,14 @@ require('packer').startup(function(use)
   -- Auto-close tags.
   use({ 'windwp/nvim-ts-autotag', after = 'nvim-treesitter' })
 
+  -- Comments.
+  use({
+    'numToStr/Comment.nvim',
+    config = function()
+      require('Comment').setup()
+    end,
+  })
+
   -- Formatting.
   use({
     'mhartington/formatter.nvim',
