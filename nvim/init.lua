@@ -2,6 +2,18 @@
 -- General options.
 --]]
 
+vim.g.markdown_fenced_languages = {
+  'bash',
+  'html',
+  'javascript',
+  'javascriptreact',
+  'json',
+  'rust',
+  'sh=bash',
+  'tsx=typescriptreact',
+  'typescript',
+  'typescriptreact',
+}
 vim.o.breakindent = true
 vim.o.completeopt = 'menu,menuone,noselect'
 vim.o.ignorecase = true
