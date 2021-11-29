@@ -6,6 +6,9 @@
 !alacritty/
 alacritty/*
 !alacritty/alacritty.yml
+!bat/
+bat/*
+!bat/config
 !nvim/
 nvim/*
 !nvim/init.lua
