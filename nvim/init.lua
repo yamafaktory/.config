@@ -110,6 +110,20 @@ require('packer').startup(function(use)
     },
     config = function()
       require('nvim-treesitter.configs').setup({
+        ensure_installed = {
+          'bash',
+          'css',
+          'dockerfile',
+          'html',
+          'javascript',
+          'json',
+          'lua',
+          'rust',
+          'toml',
+          'tsx',
+          'typescript',
+          'vim',
+        },
         highlight = {
           enable = true,
           additional_vim_regex_highlighting = false,
