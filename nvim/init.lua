@@ -127,6 +127,9 @@ require('packer').startup(function(use)
     end,
   })
 
+  -- Enhance UI.
+  use({ 'stevearc/dressing.nvim' })
+
   -- LSP, LSP installer and tab completion.
   use('neovim/nvim-lspconfig') -- Collection of configurations for built-in LSP client.
   use('hrsh7th/nvim-cmp') -- Autocompletion plugin.
@@ -390,18 +393,19 @@ cmp.setup({
 })
 
 -- Use nice icons for diagnostics.
-local signs = {
-  Error = ' ',
-  Warning = ' ',
-  Hint = ' ',
-  Information = ' ',
-}
-
-for type, icon in pairs(signs) do
-  local hl = 'LspDiagnosticsSign' .. type
-
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+local function sign_define(name, icon, hl)
+  vim.fn.sign_define(name, { text = icon, texthl = hl })
 end
+
+sign_define('DiagnosticSignError', ' ', 'DiagnosticSignError')
+sign_define('DiagnosticSignWarn', '⚠️ ', 'DiagnosticSignWarn')
+sign_define('DiagnosticSignInformation', ' ', 'DiagnosticSignInfo')
+sign_define('DiagnosticSignHint', ' ', 'DiagnosticSignHint')
+
+-- Change the border of the documentation hover window.
+vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
+  border = 'single',
+})
 
 -- Prepare on_attach and capabilities.
 -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
