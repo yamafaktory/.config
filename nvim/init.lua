@@ -82,6 +82,15 @@ require('packer').startup(function(use)
     'nvim-telescope/telescope.nvim',
     requires = { 'nvim-lua/plenary.nvim' },
   })
+  use({
+    'nvim-telescope/telescope-file-browser.nvim',
+    requires = {
+      'nvim-telescope/telescope.nvim',
+    },
+    config = function()
+      require('telescope').load_extension('file_browser')
+    end,
+  })
 
   -- Git related info in the signs columns and popups.
   use({
@@ -289,11 +298,12 @@ end)
 
 -- Telescope.
 local telescope_builtin = "<Cmd>lua require('telescope.builtin')."
-local set_telescope_keymap = function(method, leader_key)
+local telescope_builtin_extensions = "<Cmd>lua require('telescope').extensions."
+local set_telescope_keymap = function(builtin, method, leader_key)
   set_keymap(
     'n',
     '<Leader>t' .. leader_key,
-    telescope_builtin .. method .. '<CR>',
+    builtin .. method .. '<CR>',
     options
   )
 end
@@ -309,8 +319,16 @@ local telescope_mapping = {
   lr = 'lsp_references()',
 }
 
+local telescope_mapping_extensions = {
+  fb = 'file_browser.file_browser()',
+}
+
 for leader_key, method in pairs(telescope_mapping) do
-  set_telescope_keymap(method, leader_key)
+  set_telescope_keymap(telescope_builtin, method, leader_key)
+end
+
+for leader_key, method in pairs(telescope_mapping_extensions) do
+  set_telescope_keymap(telescope_builtin_extensions, method, leader_key)
 end
 
 -- FTerm.
@@ -323,7 +341,7 @@ set_keymap(
 )
 
 -- Trouble.
-set_keymap('n', '<leader>tr', '<cmd>Trouble<cr>', options)
+set_keymap('n', '<Leader>tr', '<Cmd>Trouble<CR>', options)
 
 --[[
 -- LSP Setup.
