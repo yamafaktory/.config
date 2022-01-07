@@ -123,6 +123,7 @@ require('packer').startup(function(use)
           'bash',
           'css',
           'dockerfile',
+          'graphql',
           'html',
           'javascript',
           'json',
@@ -132,6 +133,7 @@ require('packer').startup(function(use)
           'tsx',
           'typescript',
           'vim',
+          'yaml',
         },
         highlight = {
           enable = true,
@@ -268,6 +270,7 @@ require('packer').startup(function(use)
       require('formatter').setup({
         filetype = {
           css = { prettierFormatter },
+          graphql = { prettierFormatter },
           html = { prettierFormatter },
           javascript = { prettierFormatter },
           json = { prettierFormatter },
@@ -275,6 +278,7 @@ require('packer').startup(function(use)
           markdown = { prettierFormatter },
           typescript = { prettierFormatter },
           typescriptreact = { prettierFormatter },
+          yml = { prettierFormatter },
         },
       })
 
@@ -283,7 +287,7 @@ require('packer').startup(function(use)
         [[
 	  augroup FormatAutogroup
 	    autocmd!
-	    autocmd BufWritePost *.css,*.html,*.json,*.js,*.jsx,*.lua,*.md,*.ts,*.tsx FormatWrite
+	    autocmd BufWritePost *.css,*.html,*.json,*.js,*.jsx,*.lua,*.md,*.ts,*.tsx,*.yml FormatWrite
 	  augroup END
         ]],
         true
@@ -492,6 +496,7 @@ lsp_installer.on_server_ready(function(server)
     }
   end
 
+  -- Ensure that tsconfig works in monorepos.
   if server.name == 'tsserver' then
     local lspconfig = require('lspconfig')
 
@@ -501,6 +506,24 @@ lsp_installer.on_server_ready(function(server)
       '.git'
     )
     opts.settings = { documentFormatting = true }
+  end
+
+  -- Add clippy lints for Rust.
+  if server.name == 'rust_analyzer' then
+    opts.settings = {
+      ['rust-analyzer'] = {
+        cargo = {
+          allFeatures = true,
+          runBuildScripts = true,
+        },
+        checkOnSave = {
+          command = 'clippy',
+        },
+        procMacro = {
+          enable = true,
+        },
+      },
+    }
   end
 
   -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart).
