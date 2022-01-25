@@ -278,7 +278,7 @@ require('packer').startup(function(use)
           markdown = { prettierFormatter },
           typescript = { prettierFormatter },
           typescriptreact = { prettierFormatter },
-          yml = { prettierFormatter },
+          yaml = { prettierFormatter },
         },
       })
 
@@ -314,7 +314,7 @@ end
 
 local telescope_mapping = {
   b = 'buffers()',
-  fb = 'file_browser()',
+  -- Use ripgrep.
   ff = 'find_files({ find_command = {"rg", "--files", "--hidden", "-g", "!.git" }})',
   gb = 'git_branches()',
   gc = 'git_commits()',
@@ -324,7 +324,8 @@ local telescope_mapping = {
 }
 
 local telescope_mapping_extensions = {
-  fb = 'file_browser.file_browser()',
+  -- Default to current buffer location.
+  fb = 'file_browser.file_browser({ path = "%:p:h" })',
 }
 
 for leader_key, method in pairs(telescope_mapping) do
