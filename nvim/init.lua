@@ -515,6 +515,7 @@ lsp_installer.on_server_ready(function(server)
       ['rust-analyzer'] = {
         cargo = {
           allFeatures = true,
+          loadOutDirsFromCheck = true,
           runBuildScripts = true,
         },
         checkOnSave = {
