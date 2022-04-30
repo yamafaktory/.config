@@ -158,7 +158,7 @@ require('packer').startup(function(use)
   })
 
   -- Enhance UI.
-  use({ 'stevearc/dressing.nvim' })
+  use('stevearc/dressing.nvim')
 
   -- LSP, LSP installer and tab completion.
   use('neovim/nvim-lspconfig') -- Collection of configurations for built-in LSP client.
@@ -451,7 +451,11 @@ vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
   border = 'single',
 })
 
--- Prepare on_attach and capabilities.
+-- Use nvim-lsp-installer to manage the servers' setup.
+local lsp_installer = require('nvim-lsp-installer')
+local lspconfig = require('lspconfig')
+
+-- Prepare on_attach.
 -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
 local on_attach = function(_, bufnr)
   local function buf_set_keymap(...)
@@ -475,68 +479,93 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.formatting_sync()')
 end
 
+-- Prepare capabilities.
 local capabilities = require('cmp_nvim_lsp').update_capabilities(
   vim.lsp.protocol.make_client_capabilities()
 )
 
--- Use nvim-lsp-installer to manage the servers' setup.
-local lsp_installer = require('nvim-lsp-installer')
+-- List of LSP servers automatically installed.
+local servers = {
+  'bashls',
+  'dockerls',
+  'eslint',
+  'graphql',
+  'html',
+  'jsonls',
+  'rust_analyzer',
+  'sumneko_lua',
+  'taplo',
+  'tsserver',
+  'yamlls',
+}
 
-lsp_installer.on_server_ready(function(server)
-  local opts = {}
+lsp_installer.setup({
+  ensure_installed = servers,
+  ui = {
+    icons = {
+      server_installed = '',
+      server_pending = '',
+      server_uninstalled = '',
+    },
+  },
+})
 
-  opts.on_attach = on_attach
-  opts.capabilities = capabilities
+-- Setup all the servers by default.
+for _, server in ipairs(servers) do
+  lspconfig[server].setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+  })
+end
 
-  -- Fix issue with global vim being undefined for lua.
-  if server.name == 'sumneko_lua' then
-    opts.settings = {
-      Lua = {
-        diagnostics = {
-          enable = true,
-          globals = { 'vim' },
-          disable = { 'lowercase-global' },
-        },
-        workspace = {
-          library = vim.api.nvim_get_runtime_file('', true),
-        },
+-- Specific rust-analyzer setup.
+lspconfig.rust_analyzer.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  settings = {
+    ['rust-analyzer'] = {
+      -- Add clippy lints for Rust.
+      cargo = {
+        allFeatures = true,
+        loadOutDirsFromCheck = true,
+        runBuildScripts = true,
       },
-    }
-  end
-
-  -- Ensure that tsconfig works in monorepos.
-  if server.name == 'tsserver' then
-    local lspconfig = require('lspconfig')
-
-    opts.root_dir = lspconfig.util.root_pattern(
-      'yarn.lock',
-      'lerna.json',
-      '.git'
-    )
-    opts.settings = { documentFormatting = true }
-  end
-
-  -- Add clippy lints for Rust.
-  if server.name == 'rust_analyzer' then
-    opts.settings = {
-      ['rust-analyzer'] = {
-        cargo = {
-          allFeatures = true,
-          loadOutDirsFromCheck = true,
-          runBuildScripts = true,
-        },
-        checkOnSave = {
-          command = 'clippy',
-        },
-        procMacro = {
-          enable = true,
-        },
+      checkOnSave = {
+        command = 'clippy',
       },
-    }
-  end
+      procMacro = {
+        enable = true,
+      },
+    },
+  },
+})
 
-  -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart).
-  server:setup(opts)
+-- Specific sumneko_lua setup.
+lspconfig.sumneko_lua.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      diagnostics = {
+        enable = true,
+        -- Fix issue with global vim being undefined for lua.
+        globals = { 'vim' },
+        disable = { 'lowercase-global' },
+      },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file('', true),
+      },
+    },
+  },
+})
 
-  vim.cmd([[ do User LspAttachBuffers ]])
-end)
+-- Specific tsserver setup.
+lspconfig.tsserver.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  settings = {
+    documentFormatting = true,
+    -- Ensure that tsconfig works in monorepos.
+    root_dir = lspconfig.util.root_pattern('yarn.lock', 'lerna.json', '.git'),
+  },
+})
