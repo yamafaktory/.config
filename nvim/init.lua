@@ -492,6 +492,7 @@ local servers = {
   'graphql',
   'html',
   'jsonls',
+  'ltex',
   'rust_analyzer',
   'sumneko_lua',
   'taplo',
@@ -524,12 +525,12 @@ lspconfig.rust_analyzer.setup({
   capabilities = capabilities,
   settings = {
     ['rust-analyzer'] = {
-      -- Add clippy lints for Rust.
       cargo = {
         allFeatures = true,
         loadOutDirsFromCheck = true,
         runBuildScripts = true,
       },
+      -- Add clippy lints for Rust.
       checkOnSave = {
         command = 'clippy',
       },
