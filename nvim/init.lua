@@ -233,7 +233,7 @@ require('packer').startup(function(use)
   use({
     'numToStr/Comment.nvim',
     config = function()
-      require('Comment').setup()
+      require('Comment').setup({})
     end,
   })
 
@@ -385,7 +385,7 @@ cmp.setup({
     ['<C-k>'] = cmp.mapping.select_prev_item({
       behavior = cmp.SelectBehavior.Select,
     }),
-    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-Space>'] = cmp.mapping.complete({}),
     ['<C-e>'] = cmp.mapping.close(),
     ['<CR>'] = cmp.mapping.confirm({ select = true }),
     ['<Tab>'] = function(fallback)
