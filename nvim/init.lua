@@ -567,6 +567,11 @@ lspconfig.tsserver.setup({
   settings = {
     documentFormatting = true,
     -- Ensure that tsconfig works in monorepos.
-    root_dir = lspconfig.util.root_pattern('yarn.lock', 'lerna.json', '.git'),
+    root_dir = lspconfig.util.root_pattern(
+      'package.json',
+      'yarn.lock',
+      'lerna.json',
+      '.git'
+    ),
   },
 })
