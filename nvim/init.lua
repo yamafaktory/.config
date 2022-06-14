@@ -328,6 +328,7 @@ local telescope_mapping = {
   gs = 'git_status()',
   lg = 'live_grep()',
   lr = 'lsp_references()',
+  s = 'spell_suggest()',
 }
 
 local telescope_mapping_extensions = {
