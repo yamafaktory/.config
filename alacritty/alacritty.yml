@@ -1,6 +1,7 @@
 # This doesn't work as expected, yet.
-# window:
-# startup_mode: Maximized
+window:
+  dynamic_title: true
+  #startup_mode: FullScreen
 font:
   normal:
     family: JetBrainsMono Nerd Font

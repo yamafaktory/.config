@@ -48,8 +48,8 @@ if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
   )
 end
 
--- Configure Neovim to automatically run :PackerCompile whenever plugins.lua
--- is updated with an autocommand.
+-- Configure Neovim to automatically run :PackerCompile whenever init.lua is_win
+-- updated with an autocommand.
 vim.api.nvim_exec(
   [[
     augroup Packer
@@ -161,7 +161,11 @@ require('packer').startup(function(use)
   use('stevearc/dressing.nvim')
 
   -- LSP, LSP installer and tab completion.
-  use('neovim/nvim-lspconfig') -- Collection of configurations for built-in LSP client.
+  use({
+    'williamboman/mason.nvim', -- Mason.
+    'williamboman/mason-lspconfig.nvim', -- Mason LSP bridge.
+    'neovim/nvim-lspconfig', -- Collection of configurations for built-in LSP client.
+  })
   use('hrsh7th/nvim-cmp') -- Autocompletion plugin.
   use('hrsh7th/cmp-nvim-lsp') -- LSP source for nvim-cmp.
   use('saadparwaiz1/cmp_luasnip') -- Snippets source for nvim-cmp.
@@ -174,21 +178,21 @@ require('packer').startup(function(use)
       'nvim-lua/plenary.nvim',
     },
     config = function()
-      require('cmp-npm').setup({})
+      require('cmp-npm').setup()
     end,
   })
   use('ray-x/lsp_signature.nvim') -- Live lsp signatures.
   use('hrsh7th/cmp-emoji') -- Emojis completion.
 
-  -- LSP servers installer.
-  use('williamboman/nvim-lsp-installer')
+  -- Mason tool installer.
+  use('WhoIsSethDaniel/mason-tool-installer.nvim')
 
   -- Get better LSP diagnostics.
   use({
     'folke/trouble.nvim',
     requires = 'kyazdani42/nvim-web-devicons',
     config = function()
-      require('trouble').setup({})
+      require('trouble').setup()
     end,
   })
 
@@ -222,7 +226,7 @@ require('packer').startup(function(use)
     'windwp/nvim-autopairs',
     event = 'BufRead',
     config = function()
-      require('nvim-autopairs').setup({})
+      require('nvim-autopairs').setup()
     end,
   })
 
@@ -233,7 +237,7 @@ require('packer').startup(function(use)
   use({
     'numToStr/Comment.nvim',
     config = function()
-      require('Comment').setup({})
+      require('Comment').setup()
     end,
   })
 
@@ -369,7 +373,6 @@ local lspkind = require('lspkind')
 cmp.setup({
   experimental = {
     ghost_text = true,
-    native_menu = false,
   },
   formatting = {
     format = lspkind.cmp_format({ with_text = false, maxwidth = 50 }),
@@ -379,15 +382,9 @@ cmp.setup({
       require('luasnip').lsp_expand(args.body)
     end,
   },
-  mapping = {
-    ['<C-j>'] = cmp.mapping.select_next_item({
-      behavior = cmp.SelectBehavior.Select,
-    }),
-    ['<C-k>'] = cmp.mapping.select_prev_item({
-      behavior = cmp.SelectBehavior.Select,
-    }),
+  mapping = cmp.mapping.preset.insert({
     ['<C-Space>'] = cmp.mapping.complete({}),
-    ['<C-e>'] = cmp.mapping.close(),
+    ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm({ select = true }),
     ['<Tab>'] = function(fallback)
       if cmp.visible() then
@@ -423,7 +420,7 @@ cmp.setup({
         fallback()
       end
     end,
-  },
+  }),
   -- The order is used to display the completion options.
   sources = cmp.config.sources({
     { name = 'nvim_lua' },
@@ -435,6 +432,9 @@ cmp.setup({
     { name = 'crates' },
     { name = 'npm', keyword_length = 4 },
   }),
+  view = {
+    entries = 'native',
+  },
 })
 
 -- Use nice icons for diagnostics.
@@ -453,7 +453,10 @@ vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
 })
 
 -- Use nvim-lsp-installer to manage the servers' setup.
-local lsp_installer = require('nvim-lsp-installer')
+-- Each setup must stay in this specific order!
+-- See https://github.com/williamboman/mason-lspconfig.nvim#setup
+local mason = require('mason')
+local mason_lspconfig = require('mason-lspconfig')
 local lspconfig = require('lspconfig')
 
 -- Prepare on_attach.
@@ -463,21 +466,28 @@ local on_attach = function(_, bufnr)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', ...)
   end
   local lsp_buf = '<Cmd>lua vim.lsp.buf.'
+  local lsp_codelens = '<Cmd>lua vim.lsp.codelens.'
 
   -- Add some keymapping.
   buf_set_keymap('gd', lsp_buf .. 'definition()<CR>', options)
   buf_set_keymap('gr', lsp_buf .. 'rename()<CR>', options)
   buf_set_keymap('K', lsp_buf .. 'hover()<CR>', options)
-  buf_set_keymap('<Leader>s', lsp_buf .. 'signature_help()<CR>', options)
   buf_set_keymap('<Leader>a', lsp_buf .. 'code_action()<CR>', options)
   buf_set_keymap('<Leader>d', lsp_buf .. 'type_definition()<CR>', options)
+  buf_set_keymap('<Leader>s', lsp_buf .. 'signature_help()<CR>', options)
+  buf_set_keymap('<Leader>r', lsp_codelens .. 'run()<CR>', options)
 
   require('lsp_signature').on_attach({
     hint_prefix = '💡',
   })
 
-  -- Format on save.
+  -- Format on save for Rust files.
   vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.formatting_sync()')
+
+  -- Refresh codelens when creating or reading a Rust file.
+  vim.api.nvim_command(
+    'au BufNewFile,BufRead *.rs lua vim.lsp.codelens.refresh()'
+  )
 end
 
 -- Prepare capabilities.
@@ -485,24 +495,34 @@ local capabilities = require('cmp_nvim_lsp').update_capabilities(
   vim.lsp.protocol.make_client_capabilities()
 )
 
--- List of LSP servers automatically installed.
-local servers = {
-  'bashls',
-  'dockerls',
-  'eslint',
-  'graphql',
-  'html',
-  'jsonls',
-  'ltex',
-  'rust_analyzer',
-  'sumneko_lua',
+-- List of LSP servers and formatters automatically installed.
+local ensure_installed = {
+  -- Servers.
+  -- See this mapping:
+  -- https://github.com/williamboman/mason-lspconfig.nvim/blob/main/doc/server-mapping.md
+  'bash-language-server',
+  'dockerfile-language-server',
+  'eslint-lsp',
+  'graphql-language-service-cli',
+  'html-lsp',
+  'json-lsp',
+  'ltex-ls',
+  'lua-language-server',
+  'rust-analyzer',
   'taplo',
-  'tsserver',
-  'yamlls',
+  'typescript-language-server',
+  'yaml-language-server',
+  -- Formatters.
+  'prettier',
+  'stylua',
+  'yamllint',
 }
 
-lsp_installer.setup({
-  ensure_installed = servers,
+mason.setup()
+
+mason_lspconfig.setup({
+  automatic_installation = true,
+  -- ensure_installed = ensure_installed,
   ui = {
     icons = {
       server_installed = '',
@@ -512,13 +532,21 @@ lsp_installer.setup({
   },
 })
 
+require('mason-tool-installer').setup({
+  auto_update = true,
+  ensure_installed = ensure_installed,
+  run_on_start = true,
+})
+
 -- Setup all the servers by default.
-for _, server in ipairs(servers) do
-  lspconfig[server].setup({
-    on_attach = on_attach,
-    capabilities = capabilities,
-  })
-end
+mason_lspconfig.setup_handlers({
+  function(server)
+    lspconfig[server].setup({
+      on_attach = on_attach,
+      capabilities = capabilities,
+    })
+  end,
+})
 
 -- Specific rust-analyzer setup.
 lspconfig.rust_analyzer.setup({
@@ -526,6 +554,10 @@ lspconfig.rust_analyzer.setup({
   capabilities = capabilities,
   settings = {
     ['rust-analyzer'] = {
+      assist = {
+        importEnforceGranularity = true,
+        importPrefix = 'crate',
+      },
       cargo = {
         allFeatures = true,
         loadOutDirsFromCheck = true,
