@@ -452,7 +452,7 @@ vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
   border = 'single',
 })
 
--- Use nvim-lsp-installer to manage the servers' setup.
+-- Use Mason to manage the servers' setup.
 -- Each setup must stay in this specific order!
 -- See https://github.com/williamboman/mason-lspconfig.nvim#setup
 local mason = require('mason')
@@ -478,7 +478,11 @@ local on_attach = function(_, bufnr)
   buf_set_keymap('<Leader>r', lsp_codelens .. 'run()<CR>', options)
 
   require('lsp_signature').on_attach({
-    hint_prefix = '💡',
+    floating_window = false,
+    handler_opts = {
+      border = 'single',
+    },
+    hint_prefix = '👻 ',
   })
 
   -- Format on save for Rust files.
@@ -522,7 +526,6 @@ mason.setup()
 
 mason_lspconfig.setup({
   automatic_installation = true,
-  -- ensure_installed = ensure_installed,
   ui = {
     icons = {
       server_installed = '',
