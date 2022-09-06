@@ -341,7 +341,7 @@ local telescope_mapping = {
 
 local telescope_mapping_extensions = {
   -- Default to current buffer location.
-  fb = 'file_browser.file_browser({ hidden = true, path = "%:p:h" })',
+  fb = 'file_browser.file_browser({ grouped = true, hidden = true, path = "%:p:h", sorting_strategy = "ascending" })',
 }
 
 for leader_key, method in pairs(telescope_mapping) do
