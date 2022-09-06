@@ -200,9 +200,13 @@ require('packer').startup(function(use)
   use({
     'folke/tokyonight.nvim',
     config = function()
-      vim.g.tokyonight_style = 'night'
-      vim.g.tokyonight_italic_functions = true
-      vim.g.tokyonight_italic_variables = true
+      require('tokyonight').setup({
+        style = 'night',
+        styles = {
+          functions = 'italic',
+          variables = 'italic',
+        },
+      })
       vim.cmd('colorscheme tokyonight')
     end,
   })
