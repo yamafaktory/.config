@@ -152,6 +152,7 @@ require('packer').startup(function(use)
           'bash',
           'css',
           'dockerfile',
+          'fish',
           'graphql',
           'html',
           'javascript',

@@ -9,6 +9,9 @@ alacritty/*
 !bat/
 bat/*
 !bat/config
+!fish/
+fish/*
+!fish/config.fish
 !nvim/
 nvim/*
 !nvim/init.lua
