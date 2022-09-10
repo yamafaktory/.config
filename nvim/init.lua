@@ -92,6 +92,16 @@ require('packer').startup(function(use)
     config = function()
       require('telescope').setup({
         defaults = {
+          borderchars = {
+            '─',
+            '│',
+            '─',
+            '│',
+            '┌',
+            '┐',
+            '┘',
+            '└',
+          },
           dynamic_preview_title = true,
           path_display = { 'truncate' },
           -- Keep the same prompt as starship.
