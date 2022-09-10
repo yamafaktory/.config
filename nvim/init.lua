@@ -68,10 +68,13 @@ require('packer').startup(function(use)
   -- Let packer manage itself.
   use({ 'wbthomason/packer.nvim', opt = true })
 
+  -- Icons.
+  use('kyazdani42/nvim-web-devicons')
+
   -- Status line.
   use({
     'nvim-lualine/lualine.nvim',
-    requires = { 'kyazdani42/nvim-web-devicons', opt = true },
+    requires = { 'kyazdani42/nvim-web-devicons' },
     config = function()
       require('lualine').setup({
         options = {
@@ -86,6 +89,17 @@ require('packer').startup(function(use)
   use({
     'nvim-telescope/telescope.nvim',
     requires = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      require('telescope').setup({
+        defaults = {
+          dynamic_preview_title = true,
+          path_display = { 'truncate' },
+          -- Keep the same prompt as starship.
+          prompt_prefix = '❯ ',
+          scroll_strategy = 'limit',
+        },
+      })
+    end,
   })
   use({
     'nvim-telescope/telescope-file-browser.nvim',
@@ -201,6 +215,8 @@ require('packer').startup(function(use)
     'folke/tokyonight.nvim',
     config = function()
       require('tokyonight').setup({
+        hide_inactive_statusline = false,
+        lualine_bold = true,
         style = 'night',
         styles = {
           functions = 'italic',
@@ -329,8 +345,8 @@ end
 
 local telescope_mapping = {
   b = 'buffers()',
-  -- Use ripgrep.
-  ff = 'find_files({ find_command = {"rg", "--files", "--hidden", "-g", "!.git" }})',
+  -- Use https://github.com/sharkdp/fd.
+  ff = 'find_files({ find_command = { "fd", "--type", "f", "--hidden", "--strip-cwd-prefix", "--exclude", ".git" }})',
   gb = 'git_branches()',
   gc = 'git_commits()',
   gs = 'git_status()',
