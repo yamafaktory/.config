@@ -48,7 +48,21 @@ if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
   )
 end
 
--- Configure Neovim to automatically run :PackerCompile whenever init.lua is_win
+--[[
+-- Autocommands.
+--]]
+
+-- Start default terminal in insert mode.
+vim.api.nvim_exec(
+  [[
+    augroup TermEvents
+      autocmd TermOpen term://* startinsert
+    augroup end
+  ]],
+  false
+)
+
+-- Configure Neovim to automatically run :PackerCompile whenever init.lua is
 -- updated with an autocommand.
 vim.api.nvim_exec(
   [[
@@ -238,9 +252,6 @@ require('packer').startup(function(use)
     end,
   })
 
-  -- Toggle and persist a terminal.
-  use('numtostr/FTerm.nvim')
-
   -- Rust niceties.
   use('rust-lang/rust.vim')
   use({
@@ -379,14 +390,8 @@ for leader_key, method in pairs(telescope_mapping_extensions) do
   set_telescope_keymap(telescope_builtin_extensions, method, leader_key)
 end
 
--- FTerm.
-set_keymap('n', '<A-t>', '<Cmd>lua require("FTerm").toggle()<CR>', options)
-set_keymap(
-  't',
-  '<A-t>',
-  '<C-\\><C-n><Cmd>lua require("FTerm").toggle()<CR>',
-  options
-)
+-- Open default terminal.
+set_keymap('n', '<A-t>', '<Cmd>:terminal<CR>', options)
 
 -- Trouble.
 set_keymap('n', '<Leader>tr', '<Cmd>Trouble<CR>', options)
