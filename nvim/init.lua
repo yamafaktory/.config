@@ -134,6 +134,16 @@ require('packer').startup(function(use)
       require('telescope').load_extension('file_browser')
     end,
   })
+  use({
+    'nvim-telescope/telescope-fzf-native.nvim',
+    requires = {
+      'nvim-telescope/telescope.nvim',
+    },
+    config = function()
+      require('telescope').load_extension('fzf')
+    end,
+    run = 'make',
+  })
 
   -- Git related info in the signs columns and popups.
   use({
