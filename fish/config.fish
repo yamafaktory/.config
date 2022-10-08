@@ -1,6 +1,9 @@
 # Remove greeting message.
 set fish_greeting
 
+# GPG fix.
+set -gx GPG_TTY (tty)
+
 # Init Starship.
 starship init fish | source
 

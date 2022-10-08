@@ -1,7 +1,7 @@
 # This doesn't work as expected, yet.
 window:
   dynamic_title: true
-  #startup_mode: FullScreen
+  startup_mode: FullScreen
 font:
   normal:
     family: JetBrainsMono Nerd Font
@@ -15,7 +15,7 @@ font:
   bold_italic:
     family: JetBrainsMono Nerd Font
     style: Bold Italic
-  size: 14.0
+  size: 11.0
 
 # TokyoNight Alacritty Colors
 colors:
