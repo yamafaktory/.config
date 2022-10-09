@@ -418,6 +418,14 @@ set_keymap('n', '<Leader>tr', '<Cmd>Trouble<CR>', options)
 -- LSP Setup.
 --]]
 
+-- Use no prefix for diagnostics and update diagnostics in insert mode.
+vim.diagnostic.config({
+  virtual_text = {
+    prefix = '',
+  },
+  update_in_insert = true,
+})
+
 -- Start with auto-completion settings.
 local cmp = require('cmp')
 local luasnip = require('luasnip')
@@ -540,7 +548,7 @@ local on_attach = function(_, bufnr)
   })
 
   -- Format on save for Rust files.
-  vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.formatting_sync()')
+  vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.format()')
 
   -- Refresh codelens when creating or reading a Rust file.
   vim.api.nvim_command(
@@ -644,24 +652,9 @@ lspconfig.sumneko_lua.setup({
         disable = { 'lowercase-global' },
       },
       workspace = {
+        -- Make the server aware of Neovim runtime files.
         library = vim.api.nvim_get_runtime_file('', true),
       },
     },
-  },
-})
-
--- Specific tsserver setup.
-lspconfig.tsserver.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  settings = {
-    documentFormatting = true,
-    -- Ensure that tsconfig works in monorepos.
-    root_dir = lspconfig.util.root_pattern(
-      'package.json',
-      'yarn.lock',
-      'lerna.json',
-      '.git'
-    ),
   },
 })
