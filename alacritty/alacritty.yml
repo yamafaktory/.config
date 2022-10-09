@@ -15,18 +15,18 @@ font:
   bold_italic:
     family: JetBrainsMono Nerd Font
     style: Bold Italic
-  size: 11.0
+  size: 10.0
 
 # TokyoNight Alacritty Colors
 colors:
   # Default colors
   primary:
-    background: "0x1a1b26"
+    background: "0x24283b"
     foreground: "0xc0caf5"
 
   # Normal colors
   normal:
-    black: "0x15161E"
+    black: "0x1d202f"
     red: "0xf7768e"
     green: "0x9ece6a"
     yellow: "0xe0af68"

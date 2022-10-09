@@ -8,10 +8,10 @@ set -gx GPG_TTY (tty)
 starship init fish | source
 
 # TokyoNight theme.
-# https://github.com/folke/tokyonight.nvim/blob/main/extras/fish_tokyonight_night.fish
+# https://github.com/folke/tokyonight.nvim/blob/main/extras/fish/tokyonight_storm.fish
 # Color Palette.
 set -l foreground c0caf5
-set -l selection 33467c
+set -l selection 364a82
 set -l comment 565f89
 set -l red f7768e
 set -l orange ff9e64
@@ -20,7 +20,7 @@ set -l green 9ece6a
 set -l purple 9d7cd8
 set -l cyan 7dcfff
 set -l pink bb9af7
-# Syntax Highlighting Colors.
+# Syntax Highlighting Colors
 set -g fish_color_normal $foreground
 set -g fish_color_command $cyan
 set -g fish_color_keyword $pink
@@ -35,8 +35,10 @@ set -g fish_color_search_match --background=$selection
 set -g fish_color_operator $green
 set -g fish_color_escape $pink
 set -g fish_color_autosuggestion $comment
-# Completion Pager Colors.
+# Completion Pager Colors
 set -g fish_pager_color_progress $comment
 set -g fish_pager_color_prefix $cyan
 set -g fish_pager_color_completion $foreground
 set -g fish_pager_color_description $comment
+set -g fish_pager_color_selected_background --background=$selection
+

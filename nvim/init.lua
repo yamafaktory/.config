@@ -83,7 +83,14 @@ require('packer').startup(function(use)
   use({ 'wbthomason/packer.nvim', opt = true })
 
   -- Icons.
-  use('kyazdani42/nvim-web-devicons')
+  use({
+    'kyazdani42/nvim-web-devicons',
+    config = function()
+      require('nvim-web-devicons').setup({
+        default = true,
+      })
+    end,
+  })
 
   -- Status line.
   use({
@@ -252,8 +259,9 @@ require('packer').startup(function(use)
       require('tokyonight').setup({
         hide_inactive_statusline = false,
         lualine_bold = true,
-        style = 'night',
+        style = 'storm',
         styles = {
+          floats = 'transparent',
           functions = 'italic',
           variables = 'italic',
         },
@@ -479,7 +487,7 @@ cmp.setup({
     { name = 'npm', keyword_length = 4 },
   }),
   view = {
-    entries = 'native',
+    entries = 'custom',
   },
 })
 
