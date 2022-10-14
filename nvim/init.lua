@@ -613,6 +613,16 @@ mason_lspconfig.setup_handlers({
   end,
 })
 
+-- Specific eslint setup.
+lspconfig.eslint.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  -- Proper fix for monorepos, otherwise multiple clients are attached.
+  root_dir = function(fname)
+    return lspconfig.util.root_pattern('.git')(fname)
+  end,
+})
+
 -- Specific rust-analyzer setup.
 lspconfig.rust_analyzer.setup({
   on_attach = on_attach,
@@ -657,4 +667,14 @@ lspconfig.sumneko_lua.setup({
       },
     },
   },
+})
+
+-- Specific tsserver setup.
+lspconfig.tsserver.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  -- Proper fix for monorepos, otherwise multiple clients are attached.
+  root_dir = function(fname)
+    return lspconfig.util.root_pattern('.git')(fname)
+  end,
 })
