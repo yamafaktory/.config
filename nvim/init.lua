@@ -70,7 +70,7 @@ vim.api.nvim_exec(
 -- Lazy plugins.
 --]]
 
-require('lazy').setup({
+local packages = {
   -- Plenary lua functions.
   {
     'nvim-lua/plenary.nvim',
@@ -351,7 +351,9 @@ require('lazy').setup({
       )
     end,
   },
-})
+}
+
+require('lazy').setup(packages)
 
 --[[
 -- Global leader keymapping.
