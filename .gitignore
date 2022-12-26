@@ -15,4 +15,5 @@ fish/*
 !nvim/
 nvim/*
 !nvim/init.lua
+!nvim/lazy-lock.json
 

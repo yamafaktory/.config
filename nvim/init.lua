@@ -36,17 +36,21 @@ local options = { noremap = true, silent = true }
 local set_keymap = vim.api.nvim_set_keymap
 
 --[[
--- Global Packer setup.
+-- Bootstrap lazy.  
 --]]
 
-local install_path = vim.fn.stdpath('data')
-  .. '/site/pack/packer/start/packer.nvim'
-
-if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-  vim.fn.execute(
-    '!git clone https://github.com/wbthomason/packer.nvim ' .. install_path
-  )
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    'git',
+    'clone',
+    '--filter=blob:none',
+    '--single-branch',
+    'https://github.com/folke/lazy.nvim.git',
+    lazypath,
+  })
 end
+vim.opt.runtimepath:prepend(lazypath)
 
 --[[
 -- Autocommands.
@@ -62,109 +66,98 @@ vim.api.nvim_exec(
   false
 )
 
--- Configure Neovim to automatically run :PackerCompile whenever init.lua is
--- updated with an autocommand.
-vim.api.nvim_exec(
-  [[
-    augroup Packer
-      autocmd!
-      autocmd BufWritePost init.lua PackerCompile
-    augroup end
-  ]],
-  false
-)
-
 --[[
--- Packer plugins.
+-- Lazy plugins.
 --]]
 
-require('packer').startup(function(use)
-  -- Let packer manage itself.
-  use({ 'wbthomason/packer.nvim', opt = true })
-
-  -- Icons.
-  use({
-    'kyazdani42/nvim-web-devicons',
-    config = function()
-      require('nvim-web-devicons').setup({
-        default = true,
-      })
-    end,
-  })
-
-  -- Status line.
-  use({
-    'nvim-lualine/lualine.nvim',
-    requires = { 'kyazdani42/nvim-web-devicons' },
-    config = function()
-      require('lualine').setup({
-        options = {
-          globalstatus = true,
-          theme = 'tokyonight',
-        },
-      })
-    end,
-  })
-
-  -- Telescope.
-  use({
-    'nvim-telescope/telescope.nvim',
-    requires = { 'nvim-lua/plenary.nvim' },
-    config = function()
-      require('telescope').setup({
-        defaults = {
-          borderchars = {
-            '─',
-            '│',
-            '─',
-            '│',
-            '┌',
-            '┐',
-            '┘',
-            '└',
-          },
-          dynamic_preview_title = true,
-          path_display = { 'truncate' },
-          -- Keep the same prompt as starship.
-          prompt_prefix = '❯ ',
-          scroll_strategy = 'limit',
-        },
-      })
-    end,
-  })
-  use({
-    'nvim-telescope/telescope-file-browser.nvim',
-    requires = {
+require('lazy').setup({
+  -- Plenary lua functions.
+  {
+    'nvim-lua/plenary.nvim',
+    dependencies = {
+      'David-Kunz/cmp-npm',
+      'Saecki/crates.nvim',
+      'lewis6991/gitsigns.nvim',
       'nvim-telescope/telescope.nvim',
     },
+  },
+
+  -- Icons.
+  {
+    'kyazdani42/nvim-web-devicons',
+    dependencies = {
+      'folke/trouble.nvim',
+      'nvim-lualine/lualine.nvim',
+    },
+    config = {
+      default = true,
+    },
+  },
+
+  -- Status line.
+  {
+    'nvim-lualine/lualine.nvim',
+    config = {
+      options = {
+        globalstatus = true,
+        theme = 'tokyonight',
+      },
+    },
+  },
+
+  -- Telescope.
+  {
+    'nvim-telescope/telescope.nvim',
+    dependencies = {
+      'nvim-telescope/telescope-file-browser.nvim',
+      'nvim-telescope/telescope-fzf-native.nvim',
+    },
+    config = {
+      defaults = {
+        borderchars = {
+          '─',
+          '│',
+          '─',
+          '│',
+          '┌',
+          '┐',
+          '┘',
+          '└',
+        },
+        dynamic_preview_title = true,
+        path_display = { 'truncate' },
+        -- Keep the same prompt as starship.
+        prompt_prefix = '❯ ',
+        scroll_strategy = 'limit',
+      },
+    },
+  },
+
+  {
+    'nvim-telescope/telescope-file-browser.nvim',
     config = function()
       require('telescope').load_extension('file_browser')
     end,
-  })
-  use({
+  },
+
+  {
     'nvim-telescope/telescope-fzf-native.nvim',
-    requires = {
-      'nvim-telescope/telescope.nvim',
-    },
     config = function()
       require('telescope').load_extension('fzf')
     end,
-    run = 'make',
-  })
+    build = 'make',
+  },
 
   -- Git related info in the signs columns and popups.
-  use({
-    'lewis6991/gitsigns.nvim',
-    requires = { 'nvim-lua/plenary.nvim' },
-    config = function()
-      require('gitsigns').setup()
-    end,
-  })
+  { 'lewis6991/gitsigns.nvim', config = true },
 
   -- Highlight, edit, and navigate code using a fast incremental parsing library.
-  use({
+  {
     'nvim-treesitter/nvim-treesitter',
-    run = ':TSUpdate',
+    dependencies = {
+      'windwp/nvim-ts-autotag',
+    },
+    build = ':TSUpdate',
     event = 'BufRead',
     cmd = {
       'TSInstall',
@@ -177,83 +170,83 @@ require('packer').startup(function(use)
       'TSUpdate',
       'TSUpdateSync',
     },
-    config = function()
-      require('nvim-treesitter.configs').setup({
-        ensure_installed = {
-          'bash',
-          'css',
-          'dockerfile',
-          'fish',
-          'graphql',
-          'html',
-          'javascript',
-          'json',
-          'lua',
-          'rust',
-          'toml',
-          'tsx',
-          'typescript',
-          'vim',
-          'yaml',
+    config = {
+      ensure_installed = {
+        'bash',
+        'css',
+        'dockerfile',
+        'fish',
+        'graphql',
+        'html',
+        'javascript',
+        'json',
+        'lua',
+        'rust',
+        'toml',
+        'tsx',
+        'typescript',
+        'vim',
+        'yaml',
+      },
+      highlight = {
+        additional_vim_regex_highlighting = false,
+        autotag = { enable = true },
+        enable = true,
+        indent = { enable = true },
+        keymaps = {
+          init_selection = 'gnn',
+          node_decremental = 'grm',
+          node_incremental = 'grn',
+          scope_incremental = 'grc',
         },
-        highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = false,
-          matchup = { enable = true },
-          indent = { enable = true },
-          autotag = { enable = true },
-          keymaps = {
-            init_selection = 'gnn',
-            node_decremental = 'grm',
-            node_incremental = 'grn',
-            scope_incremental = 'grc',
-          },
-        },
-      })
-    end,
-  })
+        matchup = { enable = true },
+      },
+    },
+  },
 
   -- Enhance UI.
-  use('stevearc/dressing.nvim')
+  { 'stevearc/dressing.nvim', event = 'VeryLazy' },
 
   -- LSP, LSP installer and tab completion.
-  use({
-    'williamboman/mason.nvim', -- Mason.
-    'williamboman/mason-lspconfig.nvim', -- Mason LSP bridge.
-    'neovim/nvim-lspconfig', -- Collection of configurations for built-in LSP client.
-  })
-  use('hrsh7th/nvim-cmp') -- Autocompletion plugin.
-  use('hrsh7th/cmp-nvim-lsp') -- LSP source for nvim-cmp.
-  use('saadparwaiz1/cmp_luasnip') -- Snippets source for nvim-cmp.
-  use('L3MON4D3/LuaSnip') -- Snippets plugin.
-  use('onsails/lspkind-nvim') -- Adds pictograms to neovim built-in LSP.
-  use('hrsh7th/cmp-path') -- Paths completion.
-  use({
-    'David-Kunz/cmp-npm', -- npm packages autocompletion.
-    requires = {
-      'nvim-lua/plenary.nvim',
+  'williamboman/mason.nvim', -- Mason.
+  'williamboman/mason-lspconfig.nvim', -- Mason LSP bridge.
+  {
+    -- Collection of configurations for built-in LSP client.
+    'neovim/nvim-lspconfig',
+    event = 'BufReadPre',
+    dependencies = {
+      'hrsh7th/nvim-cmp',
+      'ray-x/lsp_signature.nvim',
+      'williamboman/mason-lspconfig.nvim',
+      'williamboman/mason.nvim',
     },
-    config = function()
-      require('cmp-npm').setup()
-    end,
-  })
-  use('ray-x/lsp_signature.nvim') -- Live lsp signatures.
-  use('hrsh7th/cmp-emoji') -- Emojis completion.
+  },
+  {
+    'hrsh7th/nvim-cmp',
+    event = 'InsertEnter',
+    dependencies = {
+      'David-Kunz/cmp-npm', -- npm packages autocompletion.
+      'L3MON4D3/LuaSnip', -- Snippets plugin.
+      'hrsh7th/cmp-emoji', -- Emojis completion.
+      'hrsh7th/cmp-nvim-lsp', -- LSP source for nvim-cmp.
+      'hrsh7th/cmp-path', -- Paths completion.
+      'onsails/lspkind-nvim', -- Adds pictograms to neovim built-in LSP.
+      'saadparwaiz1/cmp_luasnip', -- Snippets source for nvim-cmp.
+    },
+  },
+  'ray-x/lsp_signature.nvim', -- Live lsp signatures.
 
   -- Mason tool installer.
-  use('WhoIsSethDaniel/mason-tool-installer.nvim')
+  {
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
+    dependencies = { 'williamboman/mason.nvim' },
+  },
 
   -- Get better LSP diagnostics.
-  use({
-    'folke/trouble.nvim',
-    requires = 'kyazdani42/nvim-web-devicons',
-    config = function()
-      require('trouble').setup()
-    end,
-  })
+  { 'folke/trouble.nvim', config = true },
 
   -- Current theme.
-  use({
+  {
     'folke/tokyonight.nvim',
     config = function()
       require('tokyonight').setup({
@@ -268,41 +261,34 @@ require('packer').startup(function(use)
       })
       vim.cmd('colorscheme tokyonight')
     end,
-  })
+  },
 
   -- Rust niceties.
-  use('rust-lang/rust.vim')
-  use({
+  'rust-lang/rust.vim',
+  {
     'Saecki/crates.nvim',
     event = { 'BufRead Cargo.toml' },
-    requires = { 'nvim-lua/plenary.nvim' },
-    config = function()
-      require('crates').setup()
-    end,
-  })
+    config = true,
+  },
 
   -- Auto-close pairs.
-  use({
+  {
     'windwp/nvim-autopairs',
     event = 'BufRead',
-    config = function()
-      require('nvim-autopairs').setup()
-    end,
-  })
+    config = true,
+  },
 
   -- Auto-close tags.
-  use({ 'windwp/nvim-ts-autotag', after = 'nvim-treesitter' })
+  'windwp/nvim-ts-autotag',
 
   -- Comments.
-  use({
+  {
     'numToStr/Comment.nvim',
-    config = function()
-      require('Comment').setup()
-    end,
-  })
+    config = true,
+  },
 
   -- Formatting.
-  use({
+  {
     'mhartington/formatter.nvim',
     config = function()
       -- Use Stylua with a custom configuration.
@@ -364,8 +350,8 @@ require('packer').startup(function(use)
         true
       )
     end,
-  })
-end)
+  },
+})
 
 --[[
 -- Global leader keymapping.
@@ -557,9 +543,7 @@ local on_attach = function(_, bufnr)
 end
 
 -- Prepare capabilities.
-local capabilities = require('cmp_nvim_lsp').update_capabilities(
-  vim.lsp.protocol.make_client_capabilities()
-)
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 -- List of LSP servers and formatters automatically installed.
 local ensure_installed = {
