@@ -32,7 +32,6 @@ vim.wo.signcolumn = 'yes'
 --]]
 
 local options = { noremap = true, silent = true }
-
 local set_keymap = vim.api.nvim_set_keymap
 
 --[[
@@ -40,6 +39,7 @@ local set_keymap = vim.api.nvim_set_keymap
 --]]
 
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
     'git',
@@ -50,6 +50,7 @@ if not vim.loop.fs_stat(lazypath) then
     lazypath,
   })
 end
+
 vim.opt.runtimepath:prepend(lazypath)
 
 --[[
@@ -252,7 +253,7 @@ local packages = {
       require('tokyonight').setup({
         hide_inactive_statusline = false,
         lualine_bold = true,
-        style = 'storm',
+        style = 'moon',
         styles = {
           floats = 'transparent',
           functions = 'italic',
