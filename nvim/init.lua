@@ -173,6 +173,7 @@ local packages = {
     },
     config = {
       ensure_installed = {
+        'astro',
         'bash',
         'css',
         'dockerfile',
@@ -182,6 +183,7 @@ local packages = {
         'javascript',
         'json',
         'lua',
+        'markdown',
         'rust',
         'toml',
         'tsx',
@@ -327,6 +329,7 @@ local packages = {
       -- Apply formatters based on file type.
       require('formatter').setup({
         filetype = {
+          astro = { prettierFormatter },
           css = { prettierFormatter },
           graphql = { prettierFormatter },
           html = { prettierFormatter },
@@ -345,7 +348,7 @@ local packages = {
         [[
 	  augroup FormatAutogroup
 	    autocmd!
-	    autocmd BufWritePost *.css,*.html,*.json,*.js,*.jsx,*.lua,*.md,*.ts,*.tsx,*.yml FormatWrite
+	    autocmd BufWritePost *.astro,*.css,*.html,*.json,*.js,*.jsx,*.lua,*.md,*.ts,*.tsx,*.yml FormatWrite
 	  augroup END
         ]],
         true
@@ -553,6 +556,7 @@ local ensure_installed = {
   -- Servers.
   -- See this mapping:
   -- https://github.com/williamboman/mason-lspconfig.nvim/blob/main/doc/server-mapping.md
+  'astro-language-server',
   'bash-language-server',
   'dockerfile-language-server',
   'eslint-lsp',
