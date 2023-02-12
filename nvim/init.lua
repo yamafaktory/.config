@@ -563,6 +563,7 @@ local ensure_installed = {
   'ltex-ls',
   'lua-language-server',
   'rust-analyzer',
+  'tailwindcss-language-server',
   'taplo',
   'typescript-language-server',
   'yaml-language-server',
@@ -637,8 +638,8 @@ lspconfig.rust_analyzer.setup({
   },
 })
 
--- Specific sumneko_lua setup.
-lspconfig.sumneko_lua.setup({
+-- Specific lua setup.
+lspconfig.lua_ls.setup({
   on_attach = on_attach,
   capabilities = capabilities,
   settings = {
