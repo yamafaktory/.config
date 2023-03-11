@@ -76,7 +76,6 @@ local packages = {
   {
     'nvim-lua/plenary.nvim',
     dependencies = {
-      'David-Kunz/cmp-npm',
       'Saecki/crates.nvim',
       'lewis6991/gitsigns.nvim',
       'nvim-telescope/telescope.nvim',
@@ -227,7 +226,6 @@ local packages = {
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
     dependencies = {
-      'David-Kunz/cmp-npm', -- npm packages autocompletion.
       'L3MON4D3/LuaSnip', -- Snippets plugin.
       'hrsh7th/cmp-emoji', -- Emojis completion.
       'hrsh7th/cmp-nvim-lsp', -- LSP source for nvim-cmp.
@@ -482,7 +480,6 @@ cmp.setup({
     { name = 'path' },
     { name = 'emoji' },
     { name = 'crates' },
-    { name = 'npm', keyword_length = 4 },
   }),
   view = {
     entries = 'custom',
