@@ -100,7 +100,6 @@ local packages = {
     config = {
       options = {
         globalstatus = true,
-        theme = 'tokyonight',
       },
     },
   },
@@ -247,19 +246,15 @@ local packages = {
 
   -- Current theme.
   {
-    'folke/tokyonight.nvim',
+    'rose-pine/neovim',
+    lazy = false,
+    priority = 1000,
     config = function()
-      require('tokyonight').setup({
-        hide_inactive_statusline = false,
-        lualine_bold = true,
-        style = 'moon',
-        styles = {
-          floats = 'transparent',
-          functions = 'italic',
-          variables = 'italic',
-        },
+      require('rose-pine').setup({
+        variant = 'moon',
+        disable_float_background = true,
       })
-      vim.cmd('colorscheme tokyonight')
+      vim.cmd('colorscheme rose-pine')
     end,
   },
 
