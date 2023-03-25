@@ -284,6 +284,25 @@ local packages = {
     config = true,
   },
 
+  -- Indentation guides.
+  {
+    'lukas-reineke/indent-blankline.nvim',
+    config = function()
+      require('indent_blankline').setup({
+        char_highlight_list = { 'IndentBlanklineIndent' },
+        space_char_blankline = ' ',
+      })
+      -- Use a custom color for the guide.
+      -- Take it from the theme directly.
+      vim.cmd(
+        string.format(
+          [[highlight IndentBlanklineIndent guifg=%s gui=nocombine]],
+          require('rose-pine.palette').highlight_low
+        )
+      )
+    end,
+  },
+
   -- Formatting.
   {
     'mhartington/formatter.nvim',
