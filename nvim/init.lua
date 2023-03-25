@@ -99,7 +99,9 @@ local packages = {
     'nvim-lualine/lualine.nvim',
     config = {
       options = {
+        component_separators = '',
         globalstatus = true,
+        section_separators = '',
       },
     },
   },
