@@ -605,78 +605,74 @@ require('mason-tool-installer').setup({
   run_on_start = true,
 })
 
--- Setup all the servers by default.
+-- Setup all the servers.
 mason_lspconfig.setup_handlers({
   function(server)
-    lspconfig[server].setup({
-      on_attach = on_attach,
-      capabilities = capabilities,
-    })
-  end,
-})
-
--- Specific eslint setup.
-lspconfig.eslint.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  -- Proper fix for monorepos, otherwise multiple clients are attached.
-  root_dir = function(fname)
-    return lspconfig.util.root_pattern('.git')(fname)
-  end,
-})
-
--- Specific rust-analyzer setup.
-lspconfig.rust_analyzer.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  settings = {
-    ['rust-analyzer'] = {
-      assist = {
-        importEnforceGranularity = true,
-        importPrefix = 'crate',
-      },
-      cargo = {
-        allFeatures = true,
-        loadOutDirsFromCheck = true,
-        runBuildScripts = true,
-      },
-      -- Add clippy lints for Rust.
-      checkOnSave = {
-        command = 'clippy',
-      },
-      procMacro = {
-        enable = true,
-      },
-    },
-  },
-})
-
--- Specific lua setup.
-lspconfig.lua_ls.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  settings = {
-    Lua = {
-      diagnostics = {
-        enable = true,
-        -- Fix issue with global vim being undefined for lua.
-        globals = { 'vim' },
-        disable = { 'lowercase-global' },
-      },
-      workspace = {
-        -- Make the server aware of Neovim runtime files.
-        library = vim.api.nvim_get_runtime_file('', true),
-      },
-    },
-  },
-})
-
--- Specific tsserver setup.
-lspconfig.tsserver.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  -- Proper fix for monorepos, otherwise multiple clients are attached.
-  root_dir = function(fname)
-    return lspconfig.util.root_pattern('.git')(fname)
+    -- Specific rust-analyzer setup.
+    if server == 'rust-analyzer' then
+      lspconfig.rust_analyzer.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+          ['rust-analyzer'] = {
+            cargo = {
+              features = 'all',
+            },
+            check = {
+              command = 'clippy',
+              features = 'all',
+            },
+            procMacro = {
+              enable = true,
+            },
+          },
+        },
+      })
+    elseif server == 'eslint-lsp' then
+      -- Specific eslint setup.
+      lspconfig.eslint.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        -- Proper fix for monorepos, otherwise multiple clients are attached.
+        root_dir = function(fname)
+          return lspconfig.util.root_pattern('.git')(fname)
+        end,
+      })
+    elseif server == 'typescript-language-server' then
+      -- Specific tsserver setup.
+      lspconfig.tsserver.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        -- Proper fix for monorepos, otherwise multiple clients are attached.
+        root_dir = function(fname)
+          return lspconfig.util.root_pattern('.git')(fname)
+        end,
+      })
+    elseif server == 'lua-language-server' then
+      -- Specific lua setup.
+      lspconfig.lua_ls.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+          Lua = {
+            diagnostics = {
+              enable = true,
+              -- Fix issue with global vim being undefined for lua.
+              globals = { 'vim' },
+              disable = { 'lowercase-global' },
+            },
+            workspace = {
+              -- Make the server aware of Neovim runtime files.
+              library = vim.api.nvim_get_runtime_file('', true),
+            },
+          },
+        },
+      })
+    else
+      lspconfig[server].setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+      })
+    end
   end,
 })
