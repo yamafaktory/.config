@@ -609,7 +609,7 @@ require('mason-tool-installer').setup({
 mason_lspconfig.setup_handlers({
   function(server)
     -- Specific rust-analyzer setup.
-    if server == 'rust-analyzer' then
+    if server == 'rust_analyzer' then
       lspconfig.rust_analyzer.setup({
         on_attach = on_attach,
         capabilities = capabilities,
@@ -628,7 +628,7 @@ mason_lspconfig.setup_handlers({
           },
         },
       })
-    elseif server == 'eslint-lsp' then
+    elseif server == 'eslint' then
       -- Specific eslint setup.
       lspconfig.eslint.setup({
         on_attach = on_attach,
@@ -638,7 +638,7 @@ mason_lspconfig.setup_handlers({
           return lspconfig.util.root_pattern('.git')(fname)
         end,
       })
-    elseif server == 'typescript-language-server' then
+    elseif server == 'tsserver' then
       -- Specific tsserver setup.
       lspconfig.tsserver.setup({
         on_attach = on_attach,
@@ -648,7 +648,7 @@ mason_lspconfig.setup_handlers({
           return lspconfig.util.root_pattern('.git')(fname)
         end,
       })
-    elseif server == 'lua-language-server' then
+    elseif server == 'lua_ls' then
       -- Specific lua setup.
       lspconfig.lua_ls.setup({
         on_attach = on_attach,
