@@ -507,10 +507,10 @@ local function sign_define(name, icon, hl)
   vim.fn.sign_define(name, { text = icon, texthl = hl })
 end
 
-sign_define('DiagnosticSignError', ' ', 'DiagnosticSignError')
-sign_define('DiagnosticSignWarn', '⚠️ ', 'DiagnosticSignWarn')
+sign_define('DiagnosticSignError', '💣', 'DiagnosticSignError')
+sign_define('DiagnosticSignWarn', '⚠️', 'DiagnosticSignWarn')
 sign_define('DiagnosticSignInformation', ' ', 'DiagnosticSignInfo')
-sign_define('DiagnosticSignHint', ' ', 'DiagnosticSignHint')
+sign_define('DiagnosticSignHint', '💡', 'DiagnosticSignHint')
 
 -- Change the border of the documentation hover window.
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
@@ -627,26 +627,6 @@ mason_lspconfig.setup_handlers({
             },
           },
         },
-      })
-    elseif server == 'eslint' then
-      -- Specific eslint setup.
-      lspconfig.eslint.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        -- Proper fix for monorepos, otherwise multiple clients are attached.
-        root_dir = function(fname)
-          return lspconfig.util.root_pattern('.git')(fname)
-        end,
-      })
-    elseif server == 'tsserver' then
-      -- Specific tsserver setup.
-      lspconfig.tsserver.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        -- Proper fix for monorepos, otherwise multiple clients are attached.
-        root_dir = function(fname)
-          return lspconfig.util.root_pattern('.git')(fname)
-        end,
       })
     elseif server == 'lua_ls' then
       -- Specific lua setup.
