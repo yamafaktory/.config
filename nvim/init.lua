@@ -354,17 +354,6 @@ local packages = {
           yaml = { prettierFormatter },
         },
       })
-
-      -- Execute formatting on buffer save.
-      vim.api.nvim_exec(
-        [[
-	  augroup FormatAutogroup
-	    autocmd!
-	    autocmd BufWritePost *.css,*.html,*.json,*.js,*.jsx,*.lua,*.md,*.ts,*.tsx,*.yml FormatWrite
-	  augroup END
-        ]],
-        true
-      )
     end,
   },
 }
@@ -540,6 +529,7 @@ local on_attach = function(_, bufnr)
   buf_set_keymap('<Leader>a', lsp_buf .. 'code_action()<CR>', options)
   buf_set_keymap('<Leader>d', lsp_buf .. 'type_definition()<CR>', options)
   buf_set_keymap('<Leader>s', lsp_buf .. 'signature_help()<CR>', options)
+  buf_set_keymap('<Leader>f', lsp_buf .. 'format{ async = true }<CR>', options)
   buf_set_keymap('<Leader>r', lsp_codelens .. 'run()<CR>', options)
 
   require('lsp_signature').on_attach({
