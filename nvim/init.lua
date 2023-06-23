@@ -356,6 +356,9 @@ local packages = {
       })
     end,
   },
+
+  -- Open file in GitHub + GitLab.
+  'almo7aya/openingh.nvim',
 }
 
 require('lazy').setup(packages)
