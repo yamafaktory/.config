@@ -159,38 +159,55 @@ local packages = {
   -- Highlight, edit, and navigate code using a fast incremental parsing library.
   {
     'nvim-treesitter/nvim-treesitter',
+    version = false,
     dependencies = {
       'windwp/nvim-ts-autotag',
     },
     build = ':TSUpdate',
-    event = 'BufRead',
+    event = { 'BufReadPost', 'BufNewFile' },
     cmd = {
-      'TSInstall',
-      'TSInstallSync',
-      'TSBufEnable',
-      'TSBufToggle',
-      'TSEnableAll',
-      'TSInstallFromGrammer',
-      'TSToggleAll',
-      'TSUpdate',
       'TSUpdateSync',
     },
-    config = {
-      ensure_installed = { 'all' },
-      highlight = {
-        additional_vim_regex_highlighting = false,
-        autotag = { enable = true },
-        enable = true,
-        indent = { enable = true },
-        keymaps = {
-          init_selection = 'gnn',
-          node_decremental = 'grm',
-          node_incremental = 'grn',
-          scope_incremental = 'grc',
+    config = function()
+      local configs = require('nvim-treesitter.configs')
+
+      configs.setup({
+        ensure_installed = {
+          'bash',
+          'css',
+          'dockerfile',
+          'fish',
+          'graphql',
+          'html',
+          'javascript',
+          'java',
+          'json',
+          'lua',
+          'markdown',
+          'rust',
+	  'scss',
+	  'svelte',
+          'toml',
+          'tsx',
+          'typescript',
+          'vim',
+          'yaml',
         },
-        matchup = { enable = true },
-      },
-    },
+        highlight = {
+          additional_vim_regex_highlighting = false,
+          autotag = { enable = true },
+          enable = true,
+          indent = { enable = true },
+          keymaps = {
+            init_selection = 'gnn',
+            node_decremental = 'grm',
+            node_incremental = 'grn',
+            scope_incremental = 'grc',
+          },
+          matchup = { enable = true },
+        },
+      })
+    end,
   },
 
   -- Enhance UI.
