@@ -104,6 +104,14 @@ local packages = {
         globalstatus = true,
         section_separators = '',
       },
+      sections = {
+        -- Add Codeium status section.
+        lualine_c = {
+          function()
+            return vim.fn['codeium#GetStatusString']()
+          end,
+        },
+      },
     },
   },
 
@@ -185,8 +193,8 @@ local packages = {
           'lua',
           'markdown',
           'rust',
-	  'scss',
-	  'svelte',
+          'scss',
+          'svelte',
           'toml',
           'tsx',
           'typescript',
@@ -368,6 +376,9 @@ local packages = {
 
   -- Open file in GitHub + GitLab.
   'almo7aya/openingh.nvim',
+
+  -- Codeium.
+  'Exafunction/codeium.vim',
 }
 
 require('lazy').setup(packages)
