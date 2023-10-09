@@ -43,16 +43,16 @@ local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
-    'git',
-    'clone',
-    '--filter=blob:none',
-    '--single-branch',
-    'https://github.com/folke/lazy.nvim.git',
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
     lazypath,
   })
 end
 
-vim.opt.runtimepath:prepend(lazypath)
+vim.opt.rtp:prepend(lazypath)
 
 --[[
 -- Autocommands.
@@ -194,7 +194,6 @@ local packages = {
           'markdown',
           'rust',
           'scss',
-          'svelte',
           'toml',
           'tsx',
           'typescript',
@@ -304,18 +303,28 @@ local packages = {
   {
     'lukas-reineke/indent-blankline.nvim',
     config = function()
-      require('indent_blankline').setup({
-        char_highlight_list = { 'IndentBlanklineIndent' },
-        space_char_blankline = ' ',
-      })
-      -- Use a custom color for the guide.
-      -- Take it from the theme directly.
-      vim.cmd(
-        string.format(
-          [[highlight IndentBlanklineIndent guifg=%s gui=nocombine]],
-          require('rose-pine.palette').highlight_low
-        )
-      )
+      -- https://github.com/rose-pine/neovim/blob/main/lua/rose-pine/palette.lua
+      local highlight = {
+        'love',
+        'gold',
+        'rose',
+        'pine',
+        'foam',
+        'iris',
+      }
+      local hooks = require('ibl.hooks')
+      local palette = require('rose-pine.palette')
+
+      hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+        vim.api.nvim_set_hl(0, 'love', { fg = palette.love })
+        vim.api.nvim_set_hl(0, 'gold', { fg = palette.gold })
+        vim.api.nvim_set_hl(0, 'rose', { fg = palette.rose })
+        vim.api.nvim_set_hl(0, 'pine', { fg = palette.pine })
+        vim.api.nvim_set_hl(0, 'foam', { fg = palette.foam })
+        vim.api.nvim_set_hl(0, 'iris', { fg = palette.iris })
+      end)
+
+      require('ibl').setup({ indent = { highlight = highlight } })
     end,
   },
 
@@ -363,9 +372,9 @@ local packages = {
           html = { prettierFormatter },
           javascript = { prettierFormatter },
           json = { prettierFormatter },
+          jsonc = { prettierFormatter },
           lua = { luaFormatter },
           markdown = { prettierFormatter },
-          svelte = { prettierFormatter },
           typescript = { prettierFormatter },
           typescriptreact = { prettierFormatter },
           yaml = { prettierFormatter },
@@ -587,12 +596,12 @@ local ensure_installed = {
   'gradle-language-server',
   'graphql-language-service-cli',
   'html-lsp',
+  'jdtls',
   'json-lsp',
   'ltex-ls',
   'lua-language-server',
   'rust-analyzer',
   'shellcheck',
-  'svelte-language-server',
   'tailwindcss-language-server',
   'taplo',
   'typescript-language-server',
