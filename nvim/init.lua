@@ -43,11 +43,11 @@ local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable",
+    'git',
+    'clone',
+    '--filter=blob:none',
+    'https://github.com/folke/lazy.nvim.git',
+    '--branch=stable',
     lazypath,
   })
 end
@@ -387,7 +387,16 @@ local packages = {
   'almo7aya/openingh.nvim',
 
   -- Codeium.
-  'Exafunction/codeium.vim',
+  {
+    'Exafunction/codeium.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'hrsh7th/nvim-cmp',
+    },
+    config = function()
+      require('codeium').setup({})
+    end,
+  },
 }
 
 require('lazy').setup(packages)
@@ -462,7 +471,12 @@ cmp.setup({
     ghost_text = true,
   },
   formatting = {
-    format = lspkind.cmp_format({ with_text = false, maxwidth = 50 }),
+    format = lspkind.cmp_format({
+      ellipsis_char = '...',
+      maxwidth = 50,
+      mode = "symbol",
+      symbol_map = { Codeium = '' },
+    }),
   },
   snippet = {
     expand = function(args)
@@ -517,6 +531,7 @@ cmp.setup({
     { name = 'path' },
     { name = 'emoji' },
     { name = 'crates' },
+    { name = 'codeium' },
   }),
   view = {
     entries = 'custom',
