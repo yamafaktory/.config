@@ -247,8 +247,8 @@ local packages = {
       'saadparwaiz1/cmp_luasnip', -- Snippets source for nvim-cmp.
     },
   },
-  'ray-x/lsp_signature.nvim', -- Live lsp signatures.
-
+  -- Live lsp signatures.
+  { 'ray-x/lsp_signature.nvim', event = 'VeryLazy' },
   -- Mason tool installer.
   {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
@@ -474,7 +474,7 @@ cmp.setup({
     format = lspkind.cmp_format({
       ellipsis_char = '...',
       maxwidth = 50,
-      mode = "symbol",
+      mode = 'symbol',
       symbol_map = { Codeium = '' },
     }),
   },
