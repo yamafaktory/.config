@@ -7,6 +7,9 @@ set -gx GPG_TTY (tty)
 # Init Starship.
 starship init fish | source
 
+# Init Atuin.
+atuin init fish | source
+
 # Rosé Pine Moon theme. 
 # syntax highlighting variables
 set -l fish_color_normal e0def4
