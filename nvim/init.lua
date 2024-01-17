@@ -570,7 +570,7 @@ local on_attach = function(_, bufnr)
   local lsp_codelens = '<Cmd>lua vim.lsp.codelens.'
 
   -- Add some keymapping.
-  buf_set_keymap('gd', lsp_buf .. 'definition()<CR>', options)
+  buf_set_keymap('gd', '<Cmd>Telescope lsp_definitions<CR>', options)
   buf_set_keymap('gr', lsp_buf .. 'rename()<CR>', options)
   buf_set_keymap('K', lsp_buf .. 'hover()<CR>', options)
   buf_set_keymap('<Leader>a', lsp_buf .. 'code_action()<CR>', options)
