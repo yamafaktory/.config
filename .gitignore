@@ -6,6 +6,9 @@
 !alacritty/
 alacritty/*
 !alacritty/alacritty.toml
+!atuin/
+atuin/*
+!atuin/config.toml
 !bat/
 bat/*
 !bat/config
@@ -16,4 +19,3 @@ fish/*
 nvim/*
 !nvim/init.lua
 !nvim/lazy-lock.json
-

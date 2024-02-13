@@ -1,0 +1,10 @@
+# Execute the command immediately.
+enter_accept = true
+
+# Keymap mode.
+keymap_mode = "vim-normal"
+
+# Use Sync v2.
+# https://forum.atuin.sh/t/sync-v2-testing/124
+[sync]
+records = true

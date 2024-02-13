@@ -10,6 +10,9 @@ starship init fish | source
 # Init Atuin.
 atuin init fish | source
 
+# Cargo bin.
+set PATH $PATH ~/.cargo/bin
+
 # Rosé Pine Moon theme. 
 # syntax highlighting variables
 set -l fish_color_normal e0def4
