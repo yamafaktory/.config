@@ -663,8 +663,8 @@ mason_lspconfig.setup_handlers({
               command = 'clippy',
               features = 'all',
             },
-            procMacro = {
-              enable = true,
+            interpret = {
+              tests = true,
             },
           },
         },
