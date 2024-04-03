@@ -229,7 +229,6 @@ local packages = {
     event = 'BufReadPre',
     dependencies = {
       'hrsh7th/nvim-cmp',
-      'mfussenegger/nvim-jdtls',
       'ray-x/lsp_signature.nvim',
       'williamboman/mason-lspconfig.nvim',
       'williamboman/mason.nvim',
@@ -279,9 +278,6 @@ local packages = {
     event = { 'BufRead Cargo.toml' },
     config = true,
   },
-
-  -- Java extensions.
-  'mfussenegger/nvim-jdtls',
 
   -- Auto-close pairs.
   {
@@ -396,6 +392,40 @@ local packages = {
     config = function()
       require('codeium').setup({})
     end,
+  },
+
+  -- Java.
+  -- https://github.com/nvim-java/nvim-java/wiki/Lazyvim
+  {
+    'nvim-java/nvim-java',
+    dependencies = {
+      'nvim-java/lua-async-await',
+      'nvim-java/nvim-java-core',
+      'nvim-java/nvim-java-test',
+      'nvim-java/nvim-java-dap',
+      'MunifTanjim/nui.nvim',
+      'neovim/nvim-lspconfig',
+      'mfussenegger/nvim-dap',
+      {
+        'williamboman/mason.nvim',
+        opts = {
+          registries = {
+            'github:nvim-java/mason-registry',
+            'github:mason-org/mason-registry',
+          },
+        },
+      },
+      {
+        'williamboman/mason-lspconfig.nvim',
+        opts = {
+          handlers = {
+            ['jdtls'] = function()
+              require('java').setup()
+            end,
+          },
+        },
+      },
+    },
   },
 }
 
@@ -611,7 +641,6 @@ local ensure_installed = {
   'gradle-language-server',
   'graphql-language-service-cli',
   'html-lsp',
-  'jdtls',
   'json-lsp',
   'ltex-ls',
   'lua-language-server',
@@ -689,91 +718,11 @@ mason_lspconfig.setup_handlers({
           },
         },
       })
-    elseif server == 'jdtls' then
-      -- Noop - we don't want two clients!
-      -- The LSP is attached based on the file type.
     else
       lspconfig[server].setup({
         on_attach = on_attach,
         capabilities = capabilities,
       })
     end
-  end,
-})
-
--- Special case for Java.
--- https://github.com/mfussenegger/nvim-jdtls
--- https://github.com/VonHeikemen/lsp-zero.nvim/blob/v2.x/doc/md/guides/setup-with-nvim-jdtls.md
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'java',
-  callback = function()
-    local jdtls = require('jdtls')
-    local mason_registry = require('mason-registry')
-    local jdtls_pkg = mason_registry.get_package('jdtls')
-    local jdtls_path = jdtls_pkg:get_install_path()
-    local jdtls_bin = jdtls_path .. '/bin/jdtls'
-    local root_markers = {
-      '.git',
-      'mvnw',
-      'gradlew',
-      'pom.xml',
-      'build.gradle',
-    }
-    local root_dir = require('jdtls.setup').find_root(root_markers)
-    local workspace_folder = '/tmp/nvim/jdtls/'
-      .. vim.fn.fnamemodify(root_dir, ':p:h:t')
-    local config = {
-      cmd = {
-        jdtls_bin,
-        '-data',
-        workspace_folder,
-      },
-      on_attach = on_attach,
-      capabilities = capabilities,
-      root_dir,
-      settings = {
-        java = {
-          configuration = {
-            updateBuildConfiguration = 'automatic',
-          },
-          codeGeneration = {
-            toString = {
-              template = '${object.className}{${member.name()}=${member.value}, ${otherMembers}}',
-            },
-            useBlocks = true,
-          },
-          contentProvider = {
-            preferred = 'fernflower',
-          },
-          eclipse = {
-            downloadSources = true,
-          },
-          extendedClientCapabilities = jdtls.extendedClientCapabilities,
-          implementationsCodeLens = {
-            enabled = true,
-          },
-          maven = {
-            downloadSources = true,
-          },
-          references = {
-            includeDecompiledSources = true,
-          },
-          referencesCodeLens = {
-            enabled = true,
-          },
-          signatureHelp = {
-            enabled = true,
-          },
-          sources = {
-            organizeImports = {
-              starThreshold = 9999,
-              staticStarThreshold = 9999,
-            },
-          },
-        },
-      },
-    }
-
-    jdtls.start_or_attach(config)
   end,
 })
