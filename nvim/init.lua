@@ -103,14 +103,7 @@ local packages = {
         component_separators = '',
         globalstatus = true,
         section_separators = '',
-      },
-      sections = {
-        -- Add Codeium status section.
-        lualine_c = {
-          function()
-            return vim.fn['codeium#GetStatusString']()
-          end,
-        },
+        theme = 'rose-pine-alt',
       },
     },
   },
@@ -264,8 +257,15 @@ local packages = {
     priority = 1000,
     config = function()
       require('rose-pine').setup({
+        highlight_groups = {
+          TelescopeBorder = { fg = 'highlight_high', bg = 'none' },
+          TelescopeNormal = { bg = 'none' },
+          TelescopePromptNormal = { bg = 'base' },
+          TelescopeResultsNormal = { fg = 'subtle', bg = 'none' },
+          TelescopeSelection = { fg = 'text', bg = 'base' },
+          TelescopeSelectionCaret = { fg = 'rose', bg = 'rose' },
+        },
         variant = 'moon',
-        disable_float_background = true,
       })
       vim.cmd('colorscheme rose-pine')
     end,
@@ -321,6 +321,49 @@ local packages = {
       end)
 
       require('ibl').setup({ indent = { highlight = highlight } })
+    end,
+  },
+
+  {
+    'HiPhish/rainbow-delimiters.nvim',
+    config = function()
+      local palette = require('rose-pine.palette')
+
+      vim.api.nvim_set_hl(
+        0,
+        'RainbowDelimiterRed',
+        { fg = palette.love, ctermfg = 'White' }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        'RainbowDelimiterYellow',
+        { fg = palette.pine, ctermfg = 'White' }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        'RainbowDelimiterBlue',
+        { fg = palette.gold, ctermfg = 'White' }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        'RainbowDelimiterOrange',
+        { fg = palette.foam, ctermfg = 'White' }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        'RainbowDelimiterGreen',
+        { fg = palette.rose, ctermfg = 'White' }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        'RainbowDelimiterViolet',
+        { fg = palette.iris, ctermfg = 'White' }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        'RainbowDelimiterCyan',
+        { fg = palette.highlight_high, ctermfg = 'White' }
+      )
     end,
   },
 
@@ -706,14 +749,13 @@ mason_lspconfig.setup_handlers({
         settings = {
           Lua = {
             diagnostics = {
-              enable = true,
               -- Fix issue with global vim being undefined for lua.
               globals = { 'vim' },
-              disable = { 'lowercase-global' },
+              disable = { 'lowercase-global', 'missing_fields' },
             },
+            telemetry = { enable = false },
             workspace = {
-              -- Make the server aware of Neovim runtime files.
-              library = vim.api.nvim_get_runtime_file('', true),
+              checkThirdParty = false,
             },
           },
         },
