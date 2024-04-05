@@ -296,33 +296,7 @@ local packages = {
   },
 
   -- Indentation guides.
-  {
-    'lukas-reineke/indent-blankline.nvim',
-    config = function()
-      -- https://github.com/rose-pine/neovim/blob/main/lua/rose-pine/palette.lua
-      local highlight = {
-        'love',
-        'gold',
-        'rose',
-        'pine',
-        'foam',
-        'iris',
-      }
-      local hooks = require('ibl.hooks')
-      local palette = require('rose-pine.palette')
-
-      hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-        vim.api.nvim_set_hl(0, 'love', { fg = palette.love })
-        vim.api.nvim_set_hl(0, 'gold', { fg = palette.gold })
-        vim.api.nvim_set_hl(0, 'rose', { fg = palette.rose })
-        vim.api.nvim_set_hl(0, 'pine', { fg = palette.pine })
-        vim.api.nvim_set_hl(0, 'foam', { fg = palette.foam })
-        vim.api.nvim_set_hl(0, 'iris', { fg = palette.iris })
-      end)
-
-      require('ibl').setup({ indent = { highlight = highlight } })
-    end,
-  },
+  { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
 
   {
     'HiPhish/rainbow-delimiters.nvim',
