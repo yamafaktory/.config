@@ -222,7 +222,6 @@ local packages = {
     event = 'BufReadPre',
     dependencies = {
       'hrsh7th/nvim-cmp',
-      'ray-x/lsp_signature.nvim',
       'williamboman/mason-lspconfig.nvim',
       'williamboman/mason.nvim',
     },
@@ -239,8 +238,6 @@ local packages = {
       'saadparwaiz1/cmp_luasnip', -- Snippets source for nvim-cmp.
     },
   },
-  -- Live lsp signatures.
-  { 'ray-x/lsp_signature.nvim', event = 'VeryLazy' },
   -- Mason tool installer.
   {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
@@ -609,7 +606,7 @@ local lspconfig = require('lspconfig')
 
 -- Prepare on_attach.
 -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
   local function buf_set_keymap(...)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', ...)
   end
@@ -626,14 +623,6 @@ local on_attach = function(_, bufnr)
   buf_set_keymap('<Leader>f', lsp_buf .. 'format{ async = true }<CR>', options)
   buf_set_keymap('<Leader>r', lsp_codelens .. 'run()<CR>', options)
 
-  require('lsp_signature').on_attach({
-    floating_window = false,
-    handler_opts = {
-      border = 'single',
-    },
-    hint_prefix = '👻 ',
-  })
-
   -- Format on save for Rust files.
   vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.format()')
 
@@ -641,6 +630,10 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_command(
     'au BufNewFile,BufRead *.rs lua vim.lsp.codelens.refresh()'
   )
+
+  if client.server_capabilities.inlayHintProvider then
+    vim.lsp.inlay_hint.enable(bufnr, true)
+  end
 end
 
 -- Prepare capabilities.
@@ -715,6 +708,39 @@ mason_lspconfig.setup_handlers({
           },
         },
       })
+    elseif server == 'tsserver' then
+      -- Specific tsserver setup.
+      lspconfig.tsserver.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+          importModuleSpecifierPreference = 'non-relative',
+          typescript = {
+            inlayHints = {
+              includeInlayParameterNameHints = 'all',
+              includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+              includeInlayFunctionParameterTypeHints = true,
+              includeInlayVariableTypeHints = true,
+              includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+              includeInlayPropertyDeclarationTypeHints = true,
+              includeInlayFunctionLikeReturnTypeHints = true,
+              includeInlayEnumMemberValueHints = true,
+            },
+          },
+          javascript = {
+            inlayHints = {
+              includeInlayParameterNameHints = 'all',
+              includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+              includeInlayFunctionParameterTypeHints = true,
+              includeInlayVariableTypeHints = true,
+              includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+              includeInlayPropertyDeclarationTypeHints = true,
+              includeInlayFunctionLikeReturnTypeHints = true,
+              includeInlayEnumMemberValueHints = true,
+            },
+          },
+        },
+      })
     elseif server == 'lua_ls' then
       -- Specific lua setup.
       lspconfig.lua_ls.setup({
@@ -722,14 +748,15 @@ mason_lspconfig.setup_handlers({
         capabilities = capabilities,
         settings = {
           Lua = {
-            diagnostics = {
-              -- Fix issue with global vim being undefined for lua.
-              globals = { 'vim' },
-              disable = { 'lowercase-global', 'missing_fields' },
+            hint = {
+              enable = true,
             },
             telemetry = { enable = false },
             workspace = {
               checkThirdParty = false,
+              library = {
+                vim.env.VIMRUNTIME,
+              },
             },
           },
         },
