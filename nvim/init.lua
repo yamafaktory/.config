@@ -41,13 +41,13 @@ local set_keymap = vim.api.nvim_set_keymap
 
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 
-if not vim.loop.fs_stat(lazypath) then
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({
     'git',
     'clone',
     '--filter=blob:none',
     'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable',
+    '--branch=stable', -- latest stable release
     lazypath,
   })
 end
@@ -294,49 +294,6 @@ local packages = {
 
   -- Indentation guides.
   { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
-
-  {
-    'HiPhish/rainbow-delimiters.nvim',
-    config = function()
-      local palette = require('rose-pine.palette')
-
-      vim.api.nvim_set_hl(
-        0,
-        'RainbowDelimiterRed',
-        { fg = palette.love, ctermfg = 'White' }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        'RainbowDelimiterYellow',
-        { fg = palette.pine, ctermfg = 'White' }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        'RainbowDelimiterBlue',
-        { fg = palette.gold, ctermfg = 'White' }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        'RainbowDelimiterOrange',
-        { fg = palette.foam, ctermfg = 'White' }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        'RainbowDelimiterGreen',
-        { fg = palette.rose, ctermfg = 'White' }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        'RainbowDelimiterViolet',
-        { fg = palette.iris, ctermfg = 'White' }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        'RainbowDelimiterCyan',
-        { fg = palette.highlight_high, ctermfg = 'White' }
-      )
-    end,
-  },
 
   -- Formatting.
   {
@@ -651,6 +608,7 @@ local ensure_installed = {
   'gradle-language-server',
   'graphql-language-service-cli',
   'html-lsp',
+  'jdtls',
   'json-lsp',
   'ltex-ls',
   'lua-language-server',
@@ -710,34 +668,27 @@ mason_lspconfig.setup_handlers({
       })
     elseif server == 'tsserver' then
       -- Specific tsserver setup.
+      local inlayHints = {
+        includeInlayParameterNameHints = 'all',
+        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayVariableTypeHints = true,
+        includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayEnumMemberValueHints = true,
+      }
+
       lspconfig.tsserver.setup({
         on_attach = on_attach,
         capabilities = capabilities,
         settings = {
           importModuleSpecifierPreference = 'non-relative',
           typescript = {
-            inlayHints = {
-              includeInlayParameterNameHints = 'all',
-              includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayVariableTypeHints = true,
-              includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-              includeInlayPropertyDeclarationTypeHints = true,
-              includeInlayFunctionLikeReturnTypeHints = true,
-              includeInlayEnumMemberValueHints = true,
-            },
+            inlayHints = inlayHints,
           },
           javascript = {
-            inlayHints = {
-              includeInlayParameterNameHints = 'all',
-              includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayVariableTypeHints = true,
-              includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-              includeInlayPropertyDeclarationTypeHints = true,
-              includeInlayFunctionLikeReturnTypeHints = true,
-              includeInlayEnumMemberValueHints = true,
-            },
+            inlayHints = inlayHints,
           },
         },
       })
@@ -758,6 +709,21 @@ mason_lspconfig.setup_handlers({
                 vim.env.VIMRUNTIME,
               },
             },
+          },
+        },
+      })
+    elseif server == 'jdtls' then
+      -- Specific jdtls setup.
+      lspconfig.jdtls.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        init_options = {
+          extendedClientCapabilities = extendedClientCapabilities,
+        },
+        settings = {
+          java = {
+            inlayHints = { parameterNames = { enabled = 'all' } },
+            signatureHelp = { enabled = true },
           },
         },
       })
