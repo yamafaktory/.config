@@ -19,3 +19,6 @@ fish/*
 nvim/*
 !nvim/init.lua
 !nvim/lazy-lock.json
+!zellij/
+zellij/*
+!zellij/config.kdl
