@@ -183,7 +183,7 @@ local packages = {
           'javascript',
           'java',
           'json',
-	  'kdl',
+          'kdl',
           'lua',
           'markdown',
           'rust',
