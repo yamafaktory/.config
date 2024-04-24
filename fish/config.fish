@@ -2,7 +2,8 @@
 set fish_greeting
 
 # Default editor.
-set -Ux EDITOR nvim
+set -gx EDITOR nvim
+set -gx VISUAL $EDITOR
 
 # GPG fix.
 set -gx GPG_TTY (tty)
