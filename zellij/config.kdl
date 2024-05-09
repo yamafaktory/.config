@@ -1,6 +1,9 @@
 // Default shell.
 default_shell "fish"
 
+// Default layout.
+default_layout "compact"
+
 // Drop pane frames.
 pane_frames false
 
