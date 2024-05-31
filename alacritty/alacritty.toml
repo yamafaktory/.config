@@ -65,6 +65,9 @@ style = "Italic"
 family = "JetBrainsMono NF"
 style = "Regular"
 
+[mouse]
+hide_when_typing = true
+
 [window]
 dynamic_title = true
 startup_mode = "Fullscreen"

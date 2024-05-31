@@ -59,13 +59,13 @@ vim.opt.rtp:prepend(lazypath)
 --]]
 
 -- Start default terminal in insert mode.
-vim.api.nvim_exec(
+vim.api.nvim_exec2(
   [[
     augroup TermEvents
       autocmd TermOpen term://* startinsert
     augroup end
   ]],
-  false
+  {}
 )
 
 --[[
@@ -246,6 +246,44 @@ local packages = {
   },
 
   -- Get better LSP diagnostics.
+  {
+    'folke/trouble.nvim',
+    keys = {
+      {
+        '<leader>xx',
+        '<cmd>Trouble diagnostics toggle<cr>',
+        desc = 'Diagnostics (Trouble)',
+      },
+      {
+        '<leader>xX',
+        '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
+        desc = 'Buffer Diagnostics (Trouble)',
+      },
+      {
+        '<leader>cs',
+        '<cmd>Trouble symbols toggle focus=false<cr>',
+        desc = 'Symbols (Trouble)',
+      },
+      {
+        '<leader>cl',
+        '<cmd>Trouble lsp toggle focus=false win.position=right<cr>',
+        desc = 'LSP Definitions / references / ... (Trouble)',
+      },
+      {
+        '<leader>xL',
+        '<cmd>Trouble loclist toggle<cr>',
+        desc = 'Location List (Trouble)',
+      },
+      {
+        '<leader>xQ',
+        '<cmd>Trouble qflist toggle<cr>',
+        desc = 'Quickfix List (Trouble)',
+      },
+    },
+    opts = {
+      focus = true,
+    },
+  },
   { 'folke/trouble.nvim', config = true },
 
   -- Current theme.
@@ -337,6 +375,7 @@ local packages = {
           jsonc = { prettierFormatter },
           lua = { luaFormatter },
           markdown = { prettierFormatter },
+          scss = { prettierFormatter },
           typescript = { prettierFormatter },
           typescriptreact = { prettierFormatter },
           yaml = { prettierFormatter },
@@ -441,9 +480,6 @@ end
 
 -- Open default terminal.
 set_keymap('n', '<A-t>', '<Cmd>:terminal<CR>', options)
-
--- Trouble.
-set_keymap('n', '<Leader>tr', '<Cmd>Trouble<CR>', options)
 
 --[[
 -- LSP Setup.
@@ -585,7 +621,7 @@ local on_attach = function(client, bufnr)
   )
 
   if client.server_capabilities.inlayHintProvider then
-    vim.lsp.inlay_hint.enable(bufnr, true)
+    vim.lsp.inlay_hint.enable(true)
   end
 end
 
