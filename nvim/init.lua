@@ -389,16 +389,14 @@ local packages = {
 
   -- Codeium.
   {
-    'Exafunction/codeium.nvim',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'hrsh7th/nvim-cmp',
-    },
+    'monkoose/neocodeium',
+    event = 'VeryLazy',
     config = function()
-      require('codeium').setup({})
+      local neocodeium = require('neocodeium')
+      neocodeium.setup()
+      vim.keymap.set('i', '<A-f>', neocodeium.accept)
     end,
   },
-
   -- Java.
   -- https://github.com/nvim-java/nvim-java/wiki/Lazyvim
   {
@@ -497,9 +495,23 @@ vim.diagnostic.config({
 local cmp = require('cmp')
 local luasnip = require('luasnip')
 local lspkind = require('lspkind')
+local neocodeium = require('neocodeium')
+local commands = require('neocodeium.commands')
+
+cmp.event:on('menu_opened', function()
+  commands.disable()
+  neocodeium.clear()
+end)
+
+cmp.event:on('menu_closed', function()
+  commands.enable()
+end)
 
 -- See: https://github.com/hrsh7th/nvim-cmp
 cmp.setup({
+  completion = {
+    autocomplete = false,
+  },
   experimental = {
     ghost_text = true,
   },
@@ -508,7 +520,6 @@ cmp.setup({
       ellipsis_char = '...',
       maxwidth = 50,
       mode = 'symbol',
-      symbol_map = { Codeium = '' },
     }),
   },
   snippet = {
@@ -564,7 +575,6 @@ cmp.setup({
     { name = 'path' },
     { name = 'emoji' },
     { name = 'crates' },
-    { name = 'codeium' },
   }),
   view = {
     entries = 'custom',
@@ -642,7 +652,6 @@ local ensure_installed = {
   'html-lsp',
   'jdtls',
   'json-lsp',
-  'ltex-ls',
   'lua-language-server',
   'rust-analyzer',
   'shellcheck',
@@ -690,7 +699,6 @@ mason_lspconfig.setup_handlers({
             },
             check = {
               command = 'clippy',
-              features = 'all',
             },
             interpret = {
               tests = true,
