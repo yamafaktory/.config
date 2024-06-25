@@ -42,12 +42,13 @@ local set_keymap = vim.api.nvim_set_keymap
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   vim.fn.system({
     'git',
     'clone',
     '--filter=blob:none',
-    'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
+    '--branch=stable',
+    lazyrepo,
     lazypath,
   })
 end
@@ -85,14 +86,8 @@ local packages = {
 
   -- Icons.
   {
-    'kyazdani42/nvim-web-devicons',
-    dependencies = {
-      'folke/trouble.nvim',
-      'nvim-lualine/lualine.nvim',
-    },
-    config = {
-      default = true,
-    },
+    'nvim-tree/nvim-web-devicons',
+    lazy = true,
   },
 
   -- Status line.
@@ -183,6 +178,7 @@ local packages = {
           'javascript',
           'java',
           'json',
+          'just',
           'kdl',
           'lua',
           'markdown',
@@ -222,14 +218,13 @@ local packages = {
     'neovim/nvim-lspconfig',
     event = 'BufReadPre',
     dependencies = {
-      'hrsh7th/nvim-cmp',
+      'mason.nvim',
       'williamboman/mason-lspconfig.nvim',
-      'williamboman/mason.nvim',
     },
   },
   {
     'hrsh7th/nvim-cmp',
-    event = 'InsertEnter',
+    version = false, -- Use latest version.
     dependencies = {
       'L3MON4D3/LuaSnip', -- Snippets plugin.
       'hrsh7th/cmp-emoji', -- Emojis completion.
@@ -308,7 +303,6 @@ local packages = {
   },
 
   -- Rust niceties.
-  'rust-lang/rust.vim',
   {
     'Saecki/crates.nvim',
     event = { 'BufRead Cargo.toml' },
@@ -317,16 +311,19 @@ local packages = {
 
   -- Auto-close pairs.
   {
-    'windwp/nvim-autopairs',
-    event = 'BufRead',
-    config = true,
+    'echasnovski/mini.pairs',
+    event = 'VeryLazy',
   },
 
   -- Auto-close tags.
   'windwp/nvim-ts-autotag',
 
   -- Indentation guides.
-  { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
+  {
+    'lukas-reineke/indent-blankline.nvim',
+    main = 'ibl',
+    opts = {},
+  },
 
   -- Formatting.
   {
@@ -385,7 +382,11 @@ local packages = {
   },
 
   -- Open file in GitHub + GitLab.
-  'almo7aya/openingh.nvim',
+  {
+    'almo7aya/openingh.nvim',
+    event = 'VeryLazy',
+    config = true,
+  },
 
   -- Codeium.
   {
@@ -443,7 +444,11 @@ local packages = {
   },
 }
 
-require('lazy').setup(packages)
+require('lazy').setup({
+  spec = packages,
+  install = { colorscheme = { 'rose-pine' } },
+  checker = { enabled = true },
+})
 
 --[[
 -- Global leader keymapping.
