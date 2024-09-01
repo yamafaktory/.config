@@ -189,6 +189,7 @@ local packages = {
           'typescript',
           'vim',
           'yaml',
+          'zig',
         },
         highlight = {
           additional_vim_regex_highlighting = false,
@@ -410,38 +411,7 @@ local packages = {
 
   -- Java.
   -- https://github.com/nvim-java/nvim-java/wiki/Lazyvim
-  {
-    'nvim-java/nvim-java',
-    dependencies = {
-      'nvim-java/lua-async-await',
-      'nvim-java/nvim-java-refactor',
-      'nvim-java/nvim-java-core',
-      'nvim-java/nvim-java-test',
-      'nvim-java/nvim-java-dap',
-      'MunifTanjim/nui.nvim',
-      'neovim/nvim-lspconfig',
-      'mfussenegger/nvim-dap',
-      {
-        'williamboman/mason.nvim',
-        opts = {
-          registries = {
-            'github:nvim-java/mason-registry',
-            'github:mason-org/mason-registry',
-          },
-        },
-      },
-      {
-        'williamboman/mason-lspconfig.nvim',
-        opts = {
-          handlers = {
-            ['jdtls'] = function()
-              require('java').setup()
-            end,
-          },
-        },
-      },
-    },
-  },
+  'nvim-java/nvim-java',
 }
 
 require('lazy').setup({
@@ -616,6 +586,7 @@ vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
 -- See https://github.com/williamboman/mason-lspconfig.nvim#setup
 local mason = require('mason')
 local mason_lspconfig = require('mason-lspconfig')
+require('java').setup({})
 local lspconfig = require('lspconfig')
 
 -- Prepare on_attach.
@@ -674,6 +645,7 @@ local ensure_installed = {
   'taplo',
   'typescript-language-server',
   'yaml-language-server',
+  'zls',
   -- Formatters.
   'prettier',
   'stylua',
@@ -772,14 +744,21 @@ mason_lspconfig.setup_handlers({
       lspconfig.jdtls.setup({
         on_attach = on_attach,
         capabilities = capabilities,
-        init_options = {
-          extendedClientCapabilities = extendedClientCapabilities,
-        },
         settings = {
-          java = {
-            inlayHints = { parameterNames = { enabled = 'all' } },
-            signatureHelp = { enabled = true },
-          },
+          -- java = {
+          --   inlayHints = { parameterNames = { enabled = 'all' } },
+          --   signatureHelp = { enabled = true },
+          -- },
+        },
+      })
+    elseif server == 'zls' then
+      lspconfig.zls.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+          -- This won't be needed when https://github.com/zigtools/zls/pull/2009 will be versioned.
+          enable_build_on_save = true,
+          build_on_save_step = 'check',
         },
       })
     else
