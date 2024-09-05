@@ -674,6 +674,10 @@ require('mason-tool-installer').setup({
 -- Setup all the servers.
 mason_lspconfig.setup_handlers({
   function(server)
+    -- Fix for https://github.com/neovim/nvim-lspconfig/pull/3232. 
+    if server == 'tsserver' then
+      server = 'ts_ls'
+    end
     -- Specific rust-analyzer setup.
     if server == 'rust_analyzer' then
       lspconfig.rust_analyzer.setup({
@@ -693,7 +697,7 @@ mason_lspconfig.setup_handlers({
           },
         },
       })
-    elseif server == 'tsserver' then
+    elseif server == 'ts_ls' then
       -- Specific tsserver setup.
       local inlayHints = {
         includeInlayParameterNameHints = 'all',
@@ -706,7 +710,7 @@ mason_lspconfig.setup_handlers({
         includeInlayEnumMemberValueHints = true,
       }
 
-      lspconfig.tsserver.setup({
+      lspconfig.ts_ls.setup({
         on_attach = on_attach,
         capabilities = capabilities,
         settings = {
