@@ -94,7 +94,7 @@ local packages = {
   -- Status line.
   {
     'nvim-lualine/lualine.nvim',
-    config = {
+    opts = {
       options = {
         component_separators = '',
         globalstatus = true,
@@ -111,7 +111,7 @@ local packages = {
       'nvim-telescope/telescope-file-browser.nvim',
       'nvim-telescope/telescope-fzf-native.nvim',
     },
-    config = {
+    opts = {
       defaults = {
         borderchars = {
           '─',
@@ -225,7 +225,13 @@ local packages = {
     'hrsh7th/nvim-cmp',
     version = false, -- Use latest version.
     dependencies = {
-      'L3MON4D3/LuaSnip', -- Snippets plugin.
+      -- Snippets plugin.
+      {
+        'L3MON4D3/LuaSnip',
+        version = 'v2.*',
+        -- Install jsregexp.
+        build = 'make install_jsregexp',
+      },
       'hrsh7th/cmp-emoji', -- Emojis completion.
       'hrsh7th/cmp-nvim-lsp', -- LSP source for nvim-cmp.
       'hrsh7th/cmp-path', -- Paths completion.
@@ -409,6 +415,9 @@ require('lazy').setup({
   spec = packages,
   install = { colorscheme = { 'rose-pine' } },
   checker = { enabled = true },
+  rocks = {
+    enabled = false,
+  },
 })
 
 --[[
