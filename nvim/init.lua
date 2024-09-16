@@ -14,6 +14,7 @@ vim.g.markdown_fenced_languages = {
   'tsx=typescriptreact',
   'typescript',
   'typescriptreact',
+  'zig',
 }
 vim.o.breakindent = true
 vim.o.completeopt = 'menu,menuone,noselect'
@@ -208,9 +209,6 @@ local packages = {
     end,
   },
 
-  -- Enhance UI.
-  { 'stevearc/dressing.nvim', event = 'VeryLazy' },
-
   -- LSP, LSP installer and tab completion.
   'williamboman/mason.nvim', -- Mason.
   'williamboman/mason-lspconfig.nvim', -- Mason LSP bridge.
@@ -382,13 +380,6 @@ local packages = {
     end,
   },
 
-  -- Open file in GitHub + GitLab.
-  {
-    'almo7aya/openingh.nvim',
-    event = 'VeryLazy',
-    config = true,
-  },
-
   -- Codeium.
   {
     'monkoose/neocodeium',
@@ -481,16 +472,16 @@ local cmp = require('cmp')
 local luasnip = require('luasnip')
 local lspkind = require('lspkind')
 local neocodeium = require('neocodeium')
-local commands = require('neocodeium.commands')
 
 cmp.event:on('menu_opened', function()
-  commands.disable()
   neocodeium.clear()
 end)
 
-cmp.event:on('menu_closed', function()
-  commands.enable()
-end)
+neocodeium.setup({
+  filter = function()
+    return not cmp.visible()
+  end,
+})
 
 -- See: https://github.com/hrsh7th/nvim-cmp
 cmp.setup({
@@ -674,7 +665,7 @@ require('mason-tool-installer').setup({
 -- Setup all the servers.
 mason_lspconfig.setup_handlers({
   function(server)
-    -- Fix for https://github.com/neovim/nvim-lspconfig/pull/3232. 
+    -- Fix for https://github.com/neovim/nvim-lspconfig/pull/3232.
     if server == 'tsserver' then
       server = 'ts_ls'
     end
