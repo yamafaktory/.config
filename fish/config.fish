@@ -14,6 +14,10 @@ starship init fish | source
 # Init Atuin.
 atuin init fish | source
 
+# Bun.
+set --export BUN_INSTALL "$HOME/.bun"
+set --export PATH $BUN_INSTALL/bin $PATH
+
 # Cargo bin.
 set PATH $PATH ~/.cargo/bin
 

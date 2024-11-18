@@ -4,6 +4,14 @@ default_shell "fish"
 // Default layout.
 default_layout "compact"
 
+// Remap Alt-f which is used for Neovim/Codeium.
+keybinds {
+    normal {
+        unbind "Alt f"
+        bind "Shift Alt f" { ToggleFloatingPanes; }
+    }
+}
+
 // Drop pane frames.
 pane_frames false
 
