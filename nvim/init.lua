@@ -247,44 +247,15 @@ local packages = {
 
   -- Get better LSP diagnostics.
   {
-    'folke/trouble.nvim',
-    keys = {
-      {
-        '<leader>xx',
-        '<cmd>Trouble diagnostics toggle<cr>',
-        desc = 'Diagnostics (Trouble)',
-      },
-      {
-        '<leader>xX',
-        '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
-        desc = 'Buffer Diagnostics (Trouble)',
-      },
-      {
-        '<leader>cs',
-        '<cmd>Trouble symbols toggle focus=false<cr>',
-        desc = 'Symbols (Trouble)',
-      },
-      {
-        '<leader>cl',
-        '<cmd>Trouble lsp toggle focus=false win.position=right<cr>',
-        desc = 'LSP Definitions / references / ... (Trouble)',
-      },
-      {
-        '<leader>xL',
-        '<cmd>Trouble loclist toggle<cr>',
-        desc = 'Location List (Trouble)',
-      },
-      {
-        '<leader>xQ',
-        '<cmd>Trouble qflist toggle<cr>',
-        desc = 'Quickfix List (Trouble)',
-      },
-    },
-    opts = {
-      focus = true,
-    },
+    'rachartier/tiny-inline-diagnostic.nvim',
+    event = 'VeryLazy',
+    priority = 1000,
+    config = function()
+      require('tiny-inline-diagnostic').setup({
+        preset = 'ghost',
+      })
+    end,
   },
-  { 'folke/trouble.nvim', config = true },
 
   -- Current theme.
   {
@@ -470,10 +441,8 @@ set_keymap('n', '<A-t>', '<Cmd>:terminal<CR>', options)
 
 -- Use no prefix for diagnostics and update diagnostics in insert mode.
 vim.diagnostic.config({
-  virtual_text = {
-    prefix = '',
-  },
   update_in_insert = true,
+  virtual_text = false,
 })
 
 -- Start with auto-completion settings.
