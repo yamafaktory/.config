@@ -439,7 +439,7 @@ set_keymap('n', '<A-t>', '<Cmd>:terminal<CR>', options)
 -- LSP Setup.
 --]]
 
--- Use no prefix for diagnostics and update diagnostics in insert mode.
+-- Disable virtual text for tiny-inline-diagnostic and update diagnostics in insert mode.
 vim.diagnostic.config({
   update_in_insert = true,
   virtual_text = false,
