@@ -22,7 +22,7 @@ vim.o.ignorecase = true
 vim.o.shiftwidth = 2
 vim.o.smartcase = true
 vim.o.termguicolors = true
-vim.o.updatetime = 250
+vim.o.updatetime = 50
 vim.opt.clipboard = 'unnamedplus'
 vim.opt.cursorline = true
 vim.opt.undofile = true
@@ -41,7 +41,7 @@ local set_keymap = vim.api.nvim_set_keymap
 --]]
 
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
-
+---@diagnostic disable-next-line: undefined-field
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   vim.fn.system({
@@ -53,7 +53,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     lazypath,
   })
 end
-
 vim.opt.rtp:prepend(lazypath)
 
 --[[
@@ -245,16 +244,42 @@ local packages = {
     dependencies = { 'williamboman/mason.nvim' },
   },
 
-  -- Get better LSP diagnostics.
   {
-    'rachartier/tiny-inline-diagnostic.nvim',
-    event = 'VeryLazy',
-    priority = 1000,
-    config = function()
-      require('tiny-inline-diagnostic').setup({
-        preset = 'ghost',
-      })
-    end,
+    'folke/trouble.nvim',
+    opts = {}, -- for default options, refer to the configuration section for custom setup.
+    cmd = 'Trouble',
+    keys = {
+      {
+        '<leader>xx',
+        '<cmd>Trouble diagnostics toggle<cr>',
+        desc = 'Diagnostics (Trouble)',
+      },
+      {
+        '<leader>xX',
+        '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
+        desc = 'Buffer Diagnostics (Trouble)',
+      },
+      {
+        '<leader>cs',
+        '<cmd>Trouble symbols toggle focus=false<cr>',
+        desc = 'Symbols (Trouble)',
+      },
+      {
+        '<leader>cl',
+        '<cmd>Trouble lsp toggle focus=false win.position=right<cr>',
+        desc = 'LSP Definitions / references / ... (Trouble)',
+      },
+      {
+        '<leader>xL',
+        '<cmd>Trouble loclist toggle<cr>',
+        desc = 'Location List (Trouble)',
+      },
+      {
+        '<leader>xQ',
+        '<cmd>Trouble qflist toggle<cr>',
+        desc = 'Quickfix List (Trouble)',
+      },
+    },
   },
 
   -- Current theme.
@@ -439,10 +464,9 @@ set_keymap('n', '<A-t>', '<Cmd>:terminal<CR>', options)
 -- LSP Setup.
 --]]
 
--- Disable virtual text for tiny-inline-diagnostic and update diagnostics in insert mode.
+-- Diagnostics configuration.
 vim.diagnostic.config({
   update_in_insert = true,
-  virtual_text = false,
 })
 
 -- Start with auto-completion settings.
@@ -540,10 +564,10 @@ local function sign_define(name, icon, hl)
   vim.fn.sign_define(name, { text = icon, texthl = hl })
 end
 
-sign_define('DiagnosticSignError', '💣', 'DiagnosticSignError')
-sign_define('DiagnosticSignWarn', '⚠️', 'DiagnosticSignWarn')
-sign_define('DiagnosticSignInformation', ' ', 'DiagnosticSignInfo')
-sign_define('DiagnosticSignHint', '💡', 'DiagnosticSignHint')
+sign_define('DiagnosticSignError', '', 'DiagnosticSignError')
+sign_define('DiagnosticSignWarn', '', 'DiagnosticSignWarn')
+sign_define('DiagnosticSignInformation', '', 'DiagnosticSignInfo')
+sign_define('DiagnosticSignHint', '', 'DiagnosticSignHint')
 
 -- Change the border of the documentation hover window.
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
@@ -572,8 +596,6 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('gr', lsp_buf .. 'rename()<CR>', options)
   buf_set_keymap('K', lsp_buf .. 'hover()<CR>', options)
   buf_set_keymap('<Leader>a', lsp_buf .. 'code_action()<CR>', options)
-  buf_set_keymap('<Leader>d', lsp_buf .. 'type_definition()<CR>', options)
-  buf_set_keymap('<Leader>s', lsp_buf .. 'signature_help()<CR>', options)
   buf_set_keymap('<Leader>f', lsp_buf .. 'format{ async = true }<CR>', options)
   buf_set_keymap('<Leader>r', lsp_codelens .. 'run()<CR>', options)
 
