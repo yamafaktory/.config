@@ -576,6 +576,7 @@ local on_attach = function(client, bufnr)
   end
   local lsp_buf = '<Cmd>lua vim.lsp.buf.'
   local lsp_codelens = '<Cmd>lua vim.lsp.codelens.'
+  local gitSigns = '<Cmd>lua require("gitsigns").'
 
   -- Add some keymapping.
   buf_set_keymap('gd', '<Cmd>Telescope lsp_definitions<CR>', options)
@@ -584,6 +585,7 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('<Leader>a', lsp_buf .. 'code_action()<CR>', options)
   buf_set_keymap('<Leader>f', lsp_buf .. 'format{ async = true }<CR>', options)
   buf_set_keymap('<Leader>r', lsp_codelens .. 'run()<CR>', options)
+  buf_set_keymap('<Leader>b', gitSigns .. 'blame_line()<CR>', options)
 
   -- Format on save for Rust files.
   vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.format()')
