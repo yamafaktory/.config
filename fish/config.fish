@@ -9,6 +9,7 @@ set -gx VISUAL $EDITOR
 set -gx GPG_TTY (tty)
 
 # Init Starship.
+set -gx STARSHIP_LOG error
 starship init fish | source
 
 # Init Atuin.
