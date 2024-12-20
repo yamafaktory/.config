@@ -105,7 +105,14 @@ local packages = {
         keys = {
             {
                 '<leader>t',
-                '<cmd>lua MiniFiles.open()<cr>',
+                function()
+                    -- Open mini.files at current buffer position.
+                    local mini_files = require('mini.files')
+                    local buf_name = vim.api.nvim_buf_get_name(0)
+                    local path = vim.fn.filereadable(buf_name) == 1 and buf_name or vim.fn.getcwd()
+                    mini_files.open(path)
+                    mini_files.reveal_cwd()
+                end,
                 desc = 'Mini files',
             },
         },
@@ -124,8 +131,21 @@ local packages = {
         end,
         keys = {
             { '<leader>fb', '<cmd>FzfLua buffers<cr>', desc = 'Fzf buffers' },
+            {
+                '<leader>fd',
+                function()
+                    require('fzf-lua').lsp_definitions({ jump_to_single_result = true })
+                end,
+                desc = 'Fzf lsp definitions',
+            },
             { '<leader>ff', '<cmd>FzfLua files<cr>', desc = 'Fzf files' },
-            { '<leader>fg', '<cmd>FzfLua live_grep<cr>', desc = 'Fzf live grep' },
+            {
+                '<leader>fg',
+                function()
+                    require('fzf-lua').live_grep({ exec_empty_query = true })
+                end,
+                desc = 'Fzf live grep',
+            },
             {
                 '<leader>fgr',
                 '<cmd>FzfLua live_grep_resume<cr>',
@@ -135,7 +155,13 @@ local packages = {
     },
 
     -- Git related info in the signs columns and popups.
-    { 'lewis6991/gitsigns.nvim', config = true },
+    {
+        'lewis6991/gitsigns.nvim',
+        config = true,
+        keys = {
+            { '<leader>b', '<cmd>lua require("gitsigns").blame_line()<cr>', desc = 'Gitsigns blame' },
+        },
+    },
 
     -- Highlight, edit, and navigate code using a fast incremental parsing library.
     {
@@ -499,8 +525,6 @@ local on_attach = function(client, bufnr)
     buf_set_keymap('gr', lsp_buf .. 'rename()<cr>', options)
     buf_set_keymap('K', lsp_buf .. 'hover()<cr>', options)
     buf_set_keymap('<leader>a', lsp_buf .. 'code_action()<cr>', options)
-    buf_set_keymap('<leader>f', lsp_buf .. 'format{ async = true }<cr>', options)
-    buf_set_keymap('<leader>b', '<cmd>lua require("gitsigns").blame_line()<cr>', options)
 
     -- Format on save for Rust files.
     vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.format()')
