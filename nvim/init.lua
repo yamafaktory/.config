@@ -30,13 +30,6 @@ vim.wo.number = true
 vim.wo.signcolumn = 'yes'
 
 --[[
--- Helpers.
---]]
-
-local options = { noremap = true, silent = true }
-local set_keymap = vim.api.nvim_set_keymap
-
---[[
 -- Bootstrap lazy.  
 --]]
 
@@ -80,7 +73,6 @@ local packages = {
     dependencies = {
       'Saecki/crates.nvim',
       'lewis6991/gitsigns.nvim',
-      'nvim-telescope/telescope.nvim',
     },
   },
 
@@ -103,50 +95,27 @@ local packages = {
     },
   },
 
-  -- Telescope.
+  -- Fuzzy finder.
   {
-    'nvim-telescope/telescope.nvim',
-    dependencies = {
-      'nvim-telescope/telescope-file-browser.nvim',
-      'nvim-telescope/telescope-fzf-native.nvim',
-    },
-    opts = {
-      defaults = {
-        borderchars = {
-          '─',
-          '│',
-          '─',
-          '│',
-          '┌',
-          '┐',
-          '┘',
-          '└',
+    'ibhagwan/fzf-lua',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('fzf-lua').setup({
+        winopts = {
+          border = 'single',
         },
-        dynamic_preview_title = true,
-        layout_config = {
-          horizontal = { width = 0.9 },
-        },
-        path_display = { 'truncate' },
-        -- Keep the same prompt as starship.
-        prompt_prefix = '❯ ',
-        scroll_strategy = 'limit',
+      })
+    end,
+    keys = {
+      { '<leader>fb', '<cmd>FzfLua buffers<cr>', desc = 'Fzf buffers' },
+      { '<leader>ff', '<cmd>FzfLua files<cr>', desc = 'Fzf files' },
+      { '<leader>fg', '<cmd>FzfLua live_grep<cr>', desc = 'Fzf live grep' },
+      {
+        '<leader>fgr',
+        '<cmd>FzfLua live_grep_resume<cr>',
+        desc = 'Fzf live grep resume',
       },
     },
-  },
-
-  {
-    'nvim-telescope/telescope-file-browser.nvim',
-    config = function()
-      require('telescope').load_extension('file_browser')
-    end,
-  },
-
-  {
-    'nvim-telescope/telescope-fzf-native.nvim',
-    config = function()
-      require('telescope').load_extension('fzf')
-    end,
-    build = 'make',
   },
 
   -- Git related info in the signs columns and popups.
@@ -275,14 +244,6 @@ local packages = {
     priority = 1000,
     config = function()
       require('rose-pine').setup({
-        highlight_groups = {
-          TelescopeBorder = { fg = 'highlight_high', bg = 'none' },
-          TelescopeNormal = { bg = 'none' },
-          TelescopePromptNormal = { bg = 'base' },
-          TelescopeResultsNormal = { fg = 'subtle', bg = 'none' },
-          TelescopeSelection = { fg = 'text', bg = 'base' },
-          TelescopeSelectionCaret = { fg = 'rose', bg = 'rose' },
-        },
         variant = 'moon',
       })
       vim.cmd('colorscheme rose-pine')
@@ -372,20 +333,21 @@ local packages = {
   {
     'monkoose/neocodeium',
     event = 'VeryLazy',
-    config = function()
-      local neocodeium = require('neocodeium')
-
-      neocodeium.setup()
-
-      vim.keymap.set('i', '<A-f>', neocodeium.accept)
-      vim.keymap.set('i', '<A-w>', neocodeium.accept_word)
-      vim.keymap.set('i', '<A-a>', neocodeium.accept_line)
-      vim.keymap.set('i', '<A-e>', neocodeium.cycle_or_complete)
-      vim.keymap.set('i', '<A-r>', function()
-        require('neocodeium').cycle_or_complete(-1)
-      end)
-      vim.keymap.set('i', '<A-c>', neocodeium.clear)
-    end,
+    config = true,
+    keys = {
+      {
+        '<A-f>',
+        '<cmd>lua require("neocodeium").accept()<cr>',
+        desc = 'Neocodeium accept',
+        mode = 'i',
+      },
+      {
+        '<A-e>',
+        '<cmd>lua require("neocodeium").cycle_or_complete()<cr>',
+        desc = 'Neocodeium cycle',
+        mode = 'i',
+      },
+    },
   },
 
   -- Java.
@@ -401,50 +363,6 @@ require('lazy').setup({
     enabled = false,
   },
 })
-
---[[
--- Global leader keymapping.
---]]
-
--- Telescope.
-local telescope_builtin = "<Cmd>lua require('telescope.builtin')."
-local telescope_builtin_extensions = "<Cmd>lua require('telescope').extensions."
-local set_telescope_keymap = function(builtin, method, leader_key)
-  set_keymap(
-    'n',
-    '<Leader>t' .. leader_key,
-    builtin .. method .. '<CR>',
-    options
-  )
-end
-
-local telescope_mapping = {
-  b = 'buffers()',
-  -- Use https://github.com/sharkdp/fd.
-  ff = 'find_files({ find_command = { "fd", "--type", "f", "--hidden", "--strip-cwd-prefix", "--exclude", ".git" }})',
-  gb = 'git_branches()',
-  gc = 'git_commits()',
-  gs = 'git_status()',
-  lg = 'live_grep()',
-  lr = 'lsp_references()',
-  s = 'spell_suggest()',
-}
-
-local telescope_mapping_extensions = {
-  -- Default to current buffer location.
-  fb = 'file_browser.file_browser({ grouped = true, hidden = true, path = "%:p:h", respect_gitignore = false, sorting_strategy = "ascending" })',
-}
-
-for leader_key, method in pairs(telescope_mapping) do
-  set_telescope_keymap(telescope_builtin, method, leader_key)
-end
-
-for leader_key, method in pairs(telescope_mapping_extensions) do
-  set_telescope_keymap(telescope_builtin_extensions, method, leader_key)
-end
-
--- Open default terminal.
-set_keymap('n', '<A-t>', '<Cmd>:terminal<CR>', options)
 
 --[[
 -- LSP Setup.
@@ -574,26 +492,22 @@ local on_attach = function(client, bufnr)
   local function buf_set_keymap(...)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', ...)
   end
-  local lsp_buf = '<Cmd>lua vim.lsp.buf.'
-  local lsp_codelens = '<Cmd>lua vim.lsp.codelens.'
-  local gitSigns = '<Cmd>lua require("gitsigns").'
+  local lsp_buf = '<cmd>lua vim.lsp.buf.'
+  local options = { noremap = true, silent = true }
 
   -- Add some keymapping.
-  buf_set_keymap('gd', '<Cmd>Telescope lsp_definitions<CR>', options)
-  buf_set_keymap('gr', lsp_buf .. 'rename()<CR>', options)
-  buf_set_keymap('K', lsp_buf .. 'hover()<CR>', options)
-  buf_set_keymap('<Leader>a', lsp_buf .. 'code_action()<CR>', options)
-  buf_set_keymap('<Leader>f', lsp_buf .. 'format{ async = true }<CR>', options)
-  buf_set_keymap('<Leader>r', lsp_codelens .. 'run()<CR>', options)
-  buf_set_keymap('<Leader>b', gitSigns .. 'blame_line()<CR>', options)
+  buf_set_keymap('gr', lsp_buf .. 'rename()<cr>', options)
+  buf_set_keymap('K', lsp_buf .. 'hover()<cr>', options)
+  buf_set_keymap('<leader>a', lsp_buf .. 'code_action()<cr>', options)
+  buf_set_keymap('<leader>f', lsp_buf .. 'format{ async = true }<cr>', options)
+  buf_set_keymap(
+    '<leader>b',
+    '<cmd>lua require("gitsigns").blame_line()<cr>',
+    options
+  )
 
   -- Format on save for Rust files.
   vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.format()')
-
-  -- Refresh codelens when creating or reading a Rust file.
-  vim.api.nvim_command(
-    'au BufNewFile,BufRead *.rs lua vim.lsp.codelens.refresh()'
-  )
 
   if client.server_capabilities.inlayHintProvider then
     vim.lsp.inlay_hint.enable(true)
@@ -727,12 +641,7 @@ mason_lspconfig.setup_handlers({
       lspconfig.jdtls.setup({
         on_attach = on_attach,
         capabilities = capabilities,
-        settings = {
-          -- java = {
-          --   inlayHints = { parameterNames = { enabled = 'all' } },
-          --   signatureHelp = { enabled = true },
-          -- },
-        },
+        settings = {},
       })
     elseif server == 'zls' then
       lspconfig.zls.setup({
