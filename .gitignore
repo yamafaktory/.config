@@ -3,9 +3,6 @@
 
 # Whitelist some files.
 !.gitignore
-!alacritty/
-alacritty/*
-!alacritty/alacritty.toml
 !atuin/
 atuin/*
 !atuin/config.toml
@@ -15,10 +12,10 @@ bat/*
 !fish/
 fish/*
 !fish/config.fish
+!ghostty/
+ghostty/*
+!ghostty/config
 !nvim/
 nvim/*
 !nvim/init.lua
 !nvim/lazy-lock.json
-!zellij/
-zellij/*
-!zellij/config.kdl

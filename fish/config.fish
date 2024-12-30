@@ -58,9 +58,3 @@ set -l fish_pager_color_selected_background --background=393552
 set -l fish_pager_color_selected_prefix 9ccfd8
 set -l fish_pager_color_selected_completion e0def4
 set -l fish_pager_color_selected_description e0def4
-
-# Autostart Zellij on shell creation.
-if set -q ZELLIJ
-else
-  zellij
-end
