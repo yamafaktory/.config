@@ -32,5 +32,4 @@ keybind = ctrl+s>e=equalize_splits
 keybind = ctrl+shift+t=new_tab
 keybind = ctrl+t>shift+l=next_tab
 keybind = ctrl+t>shift+h=previous_tab
-# Tab overview.
 keybind = ctrl+shift+o=toggle_tab_overview 
