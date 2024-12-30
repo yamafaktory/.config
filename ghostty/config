@@ -1,5 +1,7 @@
 # https://ghostty.org/docs/config/reference
 # General settings.
+cursor-style = block
+cursor-style-blink = false
 font-size = 15
 fullscreen = true
 mouse-hide-while-typing = true
@@ -19,13 +21,13 @@ keybind = ctrl+shift+j=resize_split:down,10
 keybind = ctrl+shift+h=resize_split:left,10
 keybind = ctrl+shift+l=resize_split:right,10
 # Goto splits.
-keybind = ctrl+k=goto_split:top
-keybind = ctrl+j=goto_split:bottom
-keybind = ctrl+h=goto_split:left
-keybind = ctrl+l=goto_split:right
+keybind = ctrl+s>ctrl+k=goto_split:top
+keybind = ctrl+s>ctrl+j=goto_split:bottom
+keybind = ctrl+s>ctrl+h=goto_split:left
+keybind = ctrl+s>ctrl+l=goto_split:right
 # Equalize splits.
 keybind = ctrl+s>e=equalize_splits
 # Tabs.
 keybind = ctrl+t=new_tab
-keybind = ctrl+shift+l=next_tab
-keybind = ctrl+shift+h=previous_tab
+keybind = ctrl+t>shift+l=next_tab
+keybind = ctrl+t>shift+h=previous_tab
