@@ -327,7 +327,6 @@ local packages = {
   -- Formatting.
   {
     'mhartington/formatter.nvim',
-    lazy = true,
     config = function()
       -- Use Stylua with a custom configuration.
       -- https://github.com/johnnymorganz/stylua
