@@ -22,6 +22,9 @@ set --export PATH $BUN_INSTALL/bin $PATH
 # Cargo bin.
 set PATH $PATH ~/.cargo/bin
 
+# Zvm bin.
+set PATH $PATH ~/.zvm/bin
+
 # Rosé Pine Moon theme. 
 # syntax highlighting variables
 set -l fish_color_normal e0def4

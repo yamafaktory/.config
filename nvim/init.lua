@@ -562,6 +562,18 @@ end
 -- Prepare capabilities.
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
+-- Specific zls setup.
+-- Must be done before the mason setup otherwise it tries to install zls.
+lspconfig.zls.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  settings = {
+    -- This won't be needed when https://github.com/zigtools/zls/pull/2009 will be versioned.
+    enable_build_on_save = true,
+    build_on_save_step = 'check',
+  },
+})
+
 -- List of LSP servers and formatters automatically installed.
 local ensure_installed = {
   -- Servers.
@@ -586,7 +598,6 @@ local ensure_installed = {
   'typescript-language-server',
   'yaml-language-server',
   'yamllint',
-  'zls',
 }
 
 mason.setup()
@@ -686,16 +697,6 @@ mason_lspconfig.setup_handlers({
         on_attach = on_attach,
         capabilities = capabilities,
         settings = {},
-      })
-    elseif server == 'zls' then
-      lspconfig.zls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          -- This won't be needed when https://github.com/zigtools/zls/pull/2009 will be versioned.
-          enable_build_on_save = true,
-          build_on_save_step = 'check',
-        },
       })
     else
       lspconfig[server].setup({
