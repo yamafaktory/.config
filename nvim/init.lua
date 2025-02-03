@@ -239,22 +239,58 @@ local packages = {
     },
   },
   {
-    'hrsh7th/nvim-cmp',
-    version = false, -- Use latest version.
+    'saghen/blink.cmp',
+    -- optional: provides snippets for the snippet source
     dependencies = {
-      -- Snippets plugin.
-      {
-        'L3MON4D3/LuaSnip',
-        version = 'v2.*',
-        -- Install jsregexp.
-        build = 'make install_jsregexp',
-      },
-      'hrsh7th/cmp-emoji', -- Emojis completion.
-      'hrsh7th/cmp-nvim-lsp', -- LSP source for nvim-cmp.
-      'hrsh7th/cmp-path', -- Paths completion.
-      'onsails/lspkind-nvim', -- Adds pictograms to neovim built-in LSP.
-      'saadparwaiz1/cmp_luasnip', -- Snippets source for nvim-cmp.
+      'rafamadriz/friendly-snippets', -- Useful snippets to use.
+      'moyiz/blink-emoji.nvim', -- Emojis completion.
     },
+    version = '*',
+    opts = {
+      completion = {
+        menu = {
+          draw = {
+            columns = {
+              { 'kind_icon' },
+              { 'label', 'label_description', gap = 1 },
+              { 'kind' },
+              { 'source_name' },
+            },
+            treesitter = { 'lsp' },
+          },
+        },
+        ghost_text = {
+          enabled = true,
+        },
+        list = {
+          selection = {
+            preselect = false,
+          },
+        },
+      },
+      keymap = {
+        preset = 'enter',
+      },
+      appearance = {
+        use_nvim_cmp_as_default = true,
+        nerd_font_variant = 'mono',
+      },
+      signature = {
+        enabled = true,
+      },
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer', 'emoji' },
+        providers = {
+          emoji = {
+            module = 'blink-emoji',
+            name = 'Emoji',
+            score_offset = 15,
+            opts = { insert = true },
+          },
+        },
+      },
+    },
+    opts_extend = { 'sources.default' },
   },
   -- Mason tool installer.
   {
@@ -424,96 +460,6 @@ vim.diagnostic.config({
   update_in_insert = true,
 })
 
--- Start with auto-completion settings.
-local cmp = require('cmp')
-local luasnip = require('luasnip')
-local lspkind = require('lspkind')
-local neocodeium = require('neocodeium')
-
-cmp.event:on('menu_opened', function()
-  neocodeium.clear()
-end)
-
-neocodeium.setup({
-  filter = function()
-    return not cmp.visible()
-  end,
-})
-
--- See: https://github.com/hrsh7th/nvim-cmp
-cmp.setup({
-  completion = {
-    autocomplete = false,
-  },
-  experimental = {
-    ghost_text = true,
-  },
-  formatting = {
-    format = lspkind.cmp_format({
-      ellipsis_char = '...',
-      maxwidth = 50,
-      mode = 'symbol',
-    }),
-  },
-  snippet = {
-    expand = function(args)
-      require('luasnip').lsp_expand(args.body)
-    end,
-  },
-  mapping = cmp.mapping.preset.insert({
-    ['<C-Space>'] = cmp.mapping.complete({}),
-    ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
-    ['<Tab>'] = function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_jumpable() then
-        vim.fn.feedkeys(
-          vim.api.nvim_replace_termcodes(
-            '<Plug>luasnip-expand-or-jump',
-            true,
-            true,
-            true
-          ),
-          ''
-        )
-      else
-        fallback()
-      end
-    end,
-    ['<S-Tab>'] = function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
-        vim.fn.feedkeys(
-          vim.api.nvim_replace_termcodes(
-            '<Plug>luasnip-jump-prev',
-            true,
-            true,
-            true
-          ),
-          ''
-        )
-      else
-        fallback()
-      end
-    end,
-  }),
-  -- The order is used to display the completion options.
-  sources = cmp.config.sources({
-    { name = 'nvim_lua' },
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-    { name = 'buffer' },
-    { name = 'path' },
-    { name = 'emoji' },
-    { name = 'crates' },
-  }),
-  view = {
-    entries = 'custom',
-  },
-})
-
 -- Use nice icons for diagnostics.
 local function sign_define(name, icon, hl)
   vim.fn.sign_define(name, { text = icon, texthl = hl })
@@ -560,7 +506,8 @@ local on_attach = function(client, bufnr)
 end
 
 -- Prepare capabilities.
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+-- local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local capabilities = require('blink.cmp').get_lsp_capabilities()
 
 -- Specific zls setup.
 -- Must be done before the mason setup otherwise it tries to install zls.
