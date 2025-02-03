@@ -67,6 +67,19 @@ vim.api.nvim_exec2(
 --]]
 
 local packages = {
+  -- Proper lua development.
+  {
+    'folke/lazydev.nvim',
+    ft = 'lua', -- only load on lua files
+    opts = {
+      library = {
+        -- See the configuration section for more details
+        -- Load luvit types when the `vim.uv` word is found
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      },
+    },
+  },
+
   -- Plenary lua functions.
   {
     'nvim-lua/plenary.nvim',
@@ -125,8 +138,10 @@ local packages = {
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
       require('fzf-lua').setup({
+        hls = { border = 'none' },
         winopts = {
-          border = 'single',
+          border = 'none',
+          preview = { border = 'noborder' },
         },
       })
     end,
@@ -185,6 +200,7 @@ local packages = {
     config = function()
       local configs = require('nvim-treesitter.configs')
 
+      ---@diagnostic disable-next-line: missing-fields
       configs.setup({
         ensure_installed = {
           'bash',
@@ -248,7 +264,13 @@ local packages = {
     version = '*',
     opts = {
       completion = {
+        documentation = {
+          auto_show = true,
+        },
         menu = {
+          auto_show = function(ctx)
+            return ctx.mode ~= 'default'
+          end,
           draw = {
             columns = {
               { 'kind_icon' },
@@ -279,13 +301,25 @@ local packages = {
         enabled = true,
       },
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer', 'emoji' },
+        default = {
+          'lazydev',
+          'lsp',
+          'path',
+          'snippets',
+          'buffer',
+          'emoji',
+        },
         providers = {
           emoji = {
             module = 'blink-emoji',
             name = 'Emoji',
             score_offset = 15,
             opts = { insert = true },
+          },
+          lazydev = {
+            name = 'LazyDev',
+            module = 'lazydev.integrations.blink',
+            score_offset = 100,
           },
         },
       },
@@ -328,6 +362,7 @@ local packages = {
     lazy = false,
     priority = 1000,
     config = function()
+      ---@diagnostic disable-next-line: missing-fields
       require('rose-pine').setup({
         variant = 'moon',
       })
@@ -460,6 +495,23 @@ vim.diagnostic.config({
   update_in_insert = true,
 })
 
+-- Neocodeium auto-completion settings.
+local neocodeium = require('neocodeium')
+local blink = require('blink.cmp')
+
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'BlinkCmpMenuOpen',
+  callback = function()
+    neocodeium.clear()
+  end,
+})
+
+neocodeium.setup({
+  filter = function()
+    return not blink.is_visible()
+  end,
+})
+
 -- Use nice icons for diagnostics.
 local function sign_define(name, icon, hl)
   vim.fn.sign_define(name, { text = icon, texthl = hl })
@@ -469,11 +521,6 @@ sign_define('DiagnosticSignError', '', 'DiagnosticSignError')
 sign_define('DiagnosticSignWarn', '', 'DiagnosticSignWarn')
 sign_define('DiagnosticSignInformation', '', 'DiagnosticSignInfo')
 sign_define('DiagnosticSignHint', '', 'DiagnosticSignHint')
-
--- Change the border of the documentation hover window.
-vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
-  border = 'single',
-})
 
 -- Use Mason to manage the servers' setup.
 -- Each setup must stay in this specific order!
@@ -535,7 +582,6 @@ local ensure_installed = {
   'html-lsp',
   'jdtls',
   'json-lsp',
-  'lua-language-server',
   'prettier',
   'rust-analyzer',
   'shellcheck',
@@ -549,6 +595,7 @@ local ensure_installed = {
 
 mason.setup()
 
+---@diagnostic disable-next-line: missing-fields
 mason_lspconfig.setup({
   automatic_installation = true,
   ui = {
@@ -615,26 +662,6 @@ mason_lspconfig.setup_handlers({
           },
           javascript = {
             inlayHints = inlayHints,
-          },
-        },
-      })
-    elseif server == 'lua_ls' then
-      -- Specific lua setup.
-      lspconfig.lua_ls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          Lua = {
-            hint = {
-              enable = true,
-            },
-            telemetry = { enable = false },
-            workspace = {
-              checkThirdParty = false,
-              library = {
-                vim.env.VIMRUNTIME,
-              },
-            },
           },
         },
       })
