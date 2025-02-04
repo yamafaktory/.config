@@ -266,6 +266,9 @@ local packages = {
         documentation = {
           auto_show = true,
         },
+        list = {
+          selection = { preselect = false },
+        },
         menu = {
           auto_show = function(ctx)
             return ctx.mode ~= 'default'
@@ -285,6 +288,20 @@ local packages = {
         },
       },
       keymap = {
+        cmdline = {
+          ['<cr>'] = {
+            function(cmp)
+              -- Make Enter accept and execute.
+              return cmp.accept({
+                callback = function()
+                  vim.api.nvim_feedkeys('\n', 'n', true)
+                end,
+              })
+            end,
+            'fallback',
+          },
+          ['<Tab>'] = { 'select_next' },
+        },
         preset = 'enter',
       },
       appearance = {
