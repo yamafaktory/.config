@@ -138,10 +138,9 @@ local packages = {
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
       require('fzf-lua').setup({
-        hls = { border = 'none' },
         winopts = {
-          border = 'none',
-          preview = { border = 'noborder' },
+          border = 'single',
+          preview = { border = 'single' },
         },
       })
     end,
