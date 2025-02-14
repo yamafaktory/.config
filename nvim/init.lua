@@ -149,7 +149,7 @@ local packages = {
       {
         '<leader>d',
         function()
-          require('fzf-lua').lsp_definitions({ jump_to_single_result = true })
+          require('fzf-lua').lsp_definitions({ jump1 = true })
         end,
         desc = 'Fzf lsp definitions',
       },
@@ -222,6 +222,7 @@ local packages = {
           'typescript',
           'vim',
           'yaml',
+          'vue',
           'zig',
         },
         highlight = {
@@ -456,6 +457,7 @@ local packages = {
           scss = { prettierFormatter },
           typescript = { prettierFormatter },
           typescriptreact = { prettierFormatter },
+          vue = { prettierFormatter },
           yaml = { prettierFormatter },
         },
       })
@@ -600,6 +602,7 @@ local ensure_installed = {
   'tailwindcss-language-server',
   'taplo',
   'typescript-language-server',
+  'vue-language-server',
   'yaml-language-server',
   'yamllint',
 }
@@ -666,6 +669,22 @@ mason_lspconfig.setup_handlers({
       lspconfig.ts_ls.setup({
         on_attach = on_attach,
         capabilities = capabilities,
+        filetypes = {
+          'javascript',
+          'javascriptreact',
+          'typescript',
+          'typescriptreact',
+          'vue',
+        },
+        init_options = {
+          plugins = {
+            {
+              name = '@vue/typescript-plugin',
+              location = '/usr/lib/node_modules/@vue/typescript-plugin',
+              languages = { 'javascript', 'typescript', 'vue' },
+            },
+          },
+        },
         settings = {
           importModuleSpecifierPreference = 'non-relative',
           typescript = {
