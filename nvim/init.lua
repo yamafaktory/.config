@@ -288,8 +288,8 @@ local packages = {
           enabled = true,
         },
       },
-      keymap = {
-        cmdline = {
+      cmdline = {
+        keymap = {
           ['<cr>'] = {
             function(cmp)
               -- Make Enter accept and execute.
@@ -303,6 +303,8 @@ local packages = {
           },
           ['<Tab>'] = { 'select_next' },
         },
+      },
+      keymap = {
         preset = 'enter',
       },
       appearance = {
