@@ -288,22 +288,6 @@ local packages = {
           enabled = true,
         },
       },
-      cmdline = {
-        keymap = {
-          ['<cr>'] = {
-            function(cmp)
-              -- Make Enter accept and execute.
-              return cmp.accept({
-                callback = function()
-                  vim.api.nvim_feedkeys('\n', 'n', true)
-                end,
-              })
-            end,
-            'fallback',
-          },
-          ['<Tab>'] = { 'select_next' },
-        },
-      },
       keymap = {
         preset = 'enter',
       },
