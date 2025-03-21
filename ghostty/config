@@ -33,3 +33,5 @@ keybind = ctrl+shift+t=new_tab
 keybind = ctrl+t>shift+l=next_tab
 keybind = ctrl+t>shift+h=previous_tab
 keybind = ctrl+shift+o=toggle_tab_overview 
+# Disable some default keybinds.
+keybind = ctrl+enter=unbind
