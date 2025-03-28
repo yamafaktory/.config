@@ -581,6 +581,7 @@ local ensure_installed = {
   'html-lsp',
   'jdtls',
   'json-lsp',
+  'lua-language-server',
   'prettier',
   'rust-analyzer',
   'shellcheck',
@@ -678,17 +679,6 @@ mason_lspconfig.setup_handlers({
           },
           javascript = {
             inlayHints = inlayHints,
-          },
-        },
-      })
-    elseif server == 'jdtls' then
-      -- Specific jdtls setup.
-      lspconfig.jdtls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          java = {
-            inlayHints = { parameterNames = { enabled = 'all' } },
           },
         },
       })
