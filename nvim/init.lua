@@ -206,7 +206,6 @@ local packages = {
           'css',
           'dockerfile',
           'fish',
-          'graphql',
           'html',
           'javascript',
           'java',
@@ -395,58 +394,66 @@ local packages = {
 
   -- Formatting.
   {
-    'mhartington/formatter.nvim',
-    config = function()
-      -- Use Stylua with a custom configuration.
-      -- https://github.com/johnnymorganz/stylua
-      local luaFormatter = function()
-        local args = table.concat({
-          '--column-width 80',
-          '--indent-type Spaces',
-          '--indent-width 2',
-          '--line-endings Unix',
-          '--quote-style AutoPreferSingle',
-        }, ' ')
+    'stevearc/conform.nvim',
+    event = { 'BufWritePre' },
+    cmd = { 'ConformInfo' },
+    keys = {
+      {
+        '<leader><space>',
+        function()
+          require('conform').format({ async = true })
+        end,
+        mode = '',
+        desc = 'Format buffer',
+      },
+    },
+    ---@module "conform"
+    ---@type conform.setupOpts
+    opts = {
+      formatters_by_ft = (function()
+        local prettierFormatter =
+          { 'prettierd', 'prettier', stop_after_first = true }
 
         return {
-          exe = 'stylua',
-          args = {
-            args,
-            '-',
-          },
-          stdin = true,
+          css = prettierFormatter,
+          html = prettierFormatter,
+          javascript = prettierFormatter,
+          json = prettierFormatter,
+          jsonc = prettierFormatter,
+          lua = { 'stylua' },
+          markdown = prettierFormatter,
+          rust = { 'rustfmt', lsp_format = 'fallback' },
+          scss = prettierFormatter,
+          typescript = prettierFormatter,
+          typescriptreact = prettierFormatter,
+          vue = prettierFormatter,
+          yaml = prettierFormatter,
+          zig = { 'zigfmt' },
         }
-      end
-
-      local prettierFormatter = function()
-        return {
-          exe = 'prettier',
-          args = {
-            '--stdin-filepath',
-            vim.fn.fnameescape(vim.api.nvim_buf_get_name(0)),
+      end)(),
+      default_format_opts = {
+        lsp_format = 'fallback',
+      },
+      formatters = {
+        stylua = {
+          prepend_args = {
+            '--no-editorconfig',
+            '--column-width',
+            '80',
+            '--indent-type',
+            'Spaces',
+            '--indent-width',
+            '2',
+            '--line-endings',
+            'Unix',
+            '--quote-style',
+            'AutoPreferSingle',
           },
-          stdin = true,
-        }
-      end
-
-      -- Apply formatters based on file type.
-      require('formatter').setup({
-        filetype = {
-          css = { prettierFormatter },
-          graphql = { prettierFormatter },
-          html = { prettierFormatter },
-          javascript = { prettierFormatter },
-          json = { prettierFormatter },
-          jsonc = { prettierFormatter },
-          lua = { luaFormatter },
-          markdown = { prettierFormatter },
-          scss = { prettierFormatter },
-          typescript = { prettierFormatter },
-          typescriptreact = { prettierFormatter },
-          vue = { prettierFormatter },
-          yaml = { prettierFormatter },
         },
-      })
+      },
+    },
+    init = function()
+      vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
     end,
   },
 
@@ -512,14 +519,22 @@ neocodeium.setup({
 })
 
 -- Use nice icons for diagnostics.
-local function sign_define(name, icon, hl)
-  vim.fn.sign_define(name, { text = icon, texthl = hl })
-end
-
-sign_define('DiagnosticSignError', '', 'DiagnosticSignError')
-sign_define('DiagnosticSignWarn', '', 'DiagnosticSignWarn')
-sign_define('DiagnosticSignInformation', '', 'DiagnosticSignInfo')
-sign_define('DiagnosticSignHint', '', 'DiagnosticSignHint')
+vim.diagnostic.config({
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = '',
+      [vim.diagnostic.severity.WARN] = '',
+      [vim.diagnostic.severity.INFO] = '',
+      [vim.diagnostic.severity.HINT] = '',
+    },
+    numhl = {
+      [vim.diagnostic.severity.ERROR] = '',
+      [vim.diagnostic.severity.WARN] = '',
+      [vim.diagnostic.severity.HINT] = '',
+      [vim.diagnostic.severity.INFO] = '',
+    },
+  },
+})
 
 -- Use Mason to manage the servers' setup.
 -- Each setup must stay in this specific order!
@@ -543,9 +558,6 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('K', lsp_buf .. 'hover()<cr>', options)
   buf_set_keymap('<leader>a', lsp_buf .. 'code_action()<cr>', options)
 
-  -- Format on save for Rust files.
-  vim.api.nvim_command('au BufWritePre *.rs lua vim.lsp.buf.format()')
-
   if client.server_capabilities.inlayHintProvider then
     vim.lsp.inlay_hint.enable(true)
   end
@@ -562,8 +574,8 @@ lspconfig.zls.setup({
   capabilities = capabilities,
   settings = {
     -- This won't be needed when https://github.com/zigtools/zls/pull/2009 will be versioned.
-    enable_build_on_save = true,
     build_on_save_step = 'check',
+    enable_build_on_save = true,
   },
 })
 
@@ -577,7 +589,6 @@ local ensure_installed = {
   'dockerfile-language-server',
   'eslint-lsp',
   'gradle-language-server',
-  'graphql-language-service-cli',
   'html-lsp',
   'jdtls',
   'json-lsp',
