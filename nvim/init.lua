@@ -709,7 +709,7 @@ mason_lspconfig.setup_handlers({
 })
 
 -- Specific zls setup.
--- This LSP is not managed by Mason but by zmv.
+-- This LSP is not managed by Mason but by zvm.
 config_and_enable('zls', {
   on_attach = on_attach,
   capabilities = capabilities,
