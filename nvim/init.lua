@@ -216,6 +216,7 @@ local packages = {
           'markdown',
           'rust',
           'scss',
+          'sql',
           'toml',
           'tsx',
           'typescript',
@@ -291,7 +292,6 @@ local packages = {
         preset = 'enter',
       },
       appearance = {
-        use_nvim_cmp_as_default = true,
         nerd_font_variant = 'mono',
       },
       signature = {
@@ -542,7 +542,6 @@ vim.diagnostic.config({
 local mason = require('mason')
 local mason_lspconfig = require('mason-lspconfig')
 require('java').setup({})
-local lspconfig = require('lspconfig')
 
 -- Prepare on_attach.
 -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
@@ -567,17 +566,22 @@ end
 -- local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local capabilities = require('blink.cmp').get_lsp_capabilities()
 
--- Specific zls setup.
--- Must be done before the mason setup otherwise it tries to install zls.
-lspconfig.zls.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  settings = {
-    -- This won't be needed when https://github.com/zigtools/zls/pull/2009 will be versioned.
-    build_on_save_step = 'check',
-    enable_build_on_save = true,
-  },
-})
+-- Provide a generic function to configure and enable a server.
+local config_and_enable = function(server, more_settings)
+  local config = {
+    on_attach = on_attach,
+    capabilities = capabilities,
+  }
+
+  if more_settings then
+    for k, v in pairs(more_settings) do
+      config[k] = v
+    end
+  end
+
+  vim.lsp.config(server, config)
+  vim.lsp.enable(server)
+end
 
 -- List of LSP servers and formatters automatically installed.
 local ensure_installed = {
@@ -592,7 +596,9 @@ local ensure_installed = {
   'html-lsp',
   'jdtls',
   'json-lsp',
+  'just-lsp',
   'lua-language-server',
+  'postgrestools',
   'prettier',
   'rust-analyzer',
   'shellcheck',
@@ -634,7 +640,7 @@ mason_lspconfig.setup_handlers({
     end
     -- Specific rust-analyzer setup.
     if server == 'rust_analyzer' then
-      lspconfig.rust_analyzer.setup({
+      config_and_enable(server, {
         on_attach = on_attach,
         capabilities = capabilities,
         settings = {
@@ -664,7 +670,7 @@ mason_lspconfig.setup_handlers({
         includeInlayEnumMemberValueHints = true,
       }
 
-      lspconfig.ts_ls.setup({
+      config_and_enable(server, {
         on_attach = on_attach,
         capabilities = capabilities,
         filetypes = {
@@ -694,10 +700,24 @@ mason_lspconfig.setup_handlers({
         },
       })
     else
-      lspconfig[server].setup({
+      config_and_enable(server, {
         on_attach = on_attach,
         capabilities = capabilities,
       })
     end
   end,
 })
+
+-- Specific zls setup.
+-- This LSP is not managed by Mason but by zmv.
+config_and_enable('zls', {
+  on_attach = on_attach,
+  capabilities = capabilities,
+  settings = {
+    warn_style = true,
+  },
+})
+
+-- Enable some other language servers.
+config_and_enable('just')
+config_and_enable('postgres_lsp')
