@@ -49,20 +49,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 --[[
--- Autocommands.
---]]
-
--- Start default terminal in insert mode.
-vim.api.nvim_exec2(
-  [[
-    augroup TermEvents
-      autocmd TermOpen term://* startinsert
-    augroup end
-  ]],
-  {}
-)
-
---[[
 -- Lazy plugins.
 --]]
 
@@ -551,7 +537,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
 
     vim.keymap.set('n', 'gr', vim.lsp.buf.rename, opts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', 'K', function()
+      vim.lsp.buf.hover({ border = 'single' })
+    end, opts)
     vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, opts)
 
     -- Enable inlay hints if supported.
@@ -562,7 +550,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- Prepare capabilities.
--- local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local capabilities = require('blink.cmp').get_lsp_capabilities()
 
 -- List of LSP servers and formatters automatically installed.
