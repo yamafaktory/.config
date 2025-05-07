@@ -541,7 +541,8 @@ vim.diagnostic.config({
 -- See https://github.com/williamboman/mason-lspconfig.nvim#setup
 local mason = require('mason')
 local mason_lspconfig = require('mason-lspconfig')
-require('java').setup({})
+local mason_tool_installer = require('mason-tool-installer')
+-- require('java').setup({})
 
 -- Prepare on_attach.
 -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
@@ -565,23 +566,6 @@ end
 -- Prepare capabilities.
 -- local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local capabilities = require('blink.cmp').get_lsp_capabilities()
-
--- Provide a generic function to configure and enable a server.
-local config_and_enable = function(server, more_settings)
-  local config = {
-    on_attach = on_attach,
-    capabilities = capabilities,
-  }
-
-  if more_settings then
-    for k, v in pairs(more_settings) do
-      config[k] = v
-    end
-  end
-
-  vim.lsp.config(server, config)
-  vim.lsp.enable(server)
-end
 
 -- List of LSP servers and formatters automatically installed.
 local ensure_installed = {
@@ -615,7 +599,7 @@ mason.setup()
 
 ---@diagnostic disable-next-line: missing-fields
 mason_lspconfig.setup({
-  automatic_installation = true,
+  automatic_enable = true,
   ui = {
     icons = {
       server_installed = '',
@@ -625,88 +609,102 @@ mason_lspconfig.setup({
   },
 })
 
-require('mason-tool-installer').setup({
+mason_tool_installer.setup({
   auto_update = true,
   ensure_installed = ensure_installed,
-  run_on_start = true,
 })
 
--- Setup all the servers.
-mason_lspconfig.setup_handlers({
-  function(server)
-    -- Fix for https://github.com/neovim/nvim-lspconfig/pull/3232.
-    if server == 'tsserver' then
-      server = 'ts_ls'
-    end
-    -- Specific rust-analyzer setup.
-    if server == 'rust_analyzer' then
-      config_and_enable(server, {
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          ['rust-analyzer'] = {
-            cargo = {
-              features = 'all',
-            },
-            check = {
-              command = 'clippy',
-            },
-            interpret = {
-              tests = true,
-            },
-          },
-        },
-      })
-    elseif server == 'ts_ls' then
-      -- Specific tsserver setup.
-      local inlayHints = {
-        includeInlayParameterNameHints = 'all',
-        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-        includeInlayFunctionParameterTypeHints = true,
-        includeInlayVariableTypeHints = true,
-        includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-        includeInlayPropertyDeclarationTypeHints = true,
-        includeInlayFunctionLikeReturnTypeHints = true,
-        includeInlayEnumMemberValueHints = true,
-      }
+-- Setup all installed servers.
+for _, server in ipairs(mason_lspconfig.get_installed_servers()) do
+  if server == 'tsserver' then
+    server = 'ts_ls'
+  end
 
-      config_and_enable(server, {
-        on_attach = on_attach,
-        capabilities = capabilities,
-        filetypes = {
-          'javascript',
-          'javascriptreact',
-          'typescript',
-          'typescriptreact',
-          'vue',
-        },
-        init_options = {
-          plugins = {
-            {
-              name = '@vue/typescript-plugin',
-              location = '/usr/lib/node_modules/@vue/typescript-plugin',
-              languages = { 'javascript', 'typescript', 'vue' },
-            },
+  -- Specific rust-analyzer setup.
+  if server == 'rust_analyzer' then
+    vim.lsp.config(server, {
+      on_attach = on_attach,
+      capabilities = capabilities,
+      settings = {
+        ['rust-analyzer'] = {
+          cargo = {
+            features = 'all',
+          },
+          check = {
+            command = 'clippy',
+          },
+          interpret = {
+            tests = true,
           },
         },
-        settings = {
-          importModuleSpecifierPreference = 'non-relative',
-          typescript = {
-            inlayHints = inlayHints,
-          },
-          javascript = {
-            inlayHints = inlayHints,
+      },
+    })
+  elseif server == 'ts_ls' then
+    -- Specific tsserver setup.
+    local inlayHints = {
+      includeInlayParameterNameHints = 'all',
+      includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+      includeInlayFunctionParameterTypeHints = true,
+      includeInlayVariableTypeHints = true,
+      includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+      includeInlayPropertyDeclarationTypeHints = true,
+      includeInlayFunctionLikeReturnTypeHints = true,
+      includeInlayEnumMemberValueHints = true,
+    }
+
+    vim.lsp.config(server, {
+      on_attach = on_attach,
+      capabilities = capabilities,
+      filetypes = {
+        'javascript',
+        'javascriptreact',
+        'typescript',
+        'typescriptreact',
+        'vue',
+      },
+      init_options = {
+        plugins = {
+          {
+            name = '@vue/typescript-plugin',
+            location = '/usr/lib/node_modules/@vue/typescript-plugin',
+            languages = { 'javascript', 'typescript', 'vue' },
           },
         },
-      })
-    else
-      config_and_enable(server, {
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
+      },
+      settings = {
+        importModuleSpecifierPreference = 'non-relative',
+        typescript = {
+          inlayHints = inlayHints,
+        },
+        javascript = {
+          inlayHints = inlayHints,
+        },
+      },
+    })
+  else
+    vim.lsp.config(server, {
+      on_attach = on_attach,
+      capabilities = capabilities,
+    })
+  end
+end
+
+-- Provide a generic function to configure and enable servers not managed by Mason.
+local config_and_enable = function(server, more_settings)
+  local config = {
+    on_attach = on_attach,
+    capabilities = capabilities,
+  }
+
+  if more_settings then
+    for k, v in pairs(more_settings) do
+      config[k] = v
     end
-  end,
-})
+  end
+
+  vim.lsp.config(server, config)
+  vim.lsp.enable(server)
+end
 
 -- Specific zls setup.
 -- This LSP is not managed by Mason but by zvm.
