@@ -544,24 +544,22 @@ local mason_lspconfig = require('mason-lspconfig')
 local mason_tool_installer = require('mason-tool-installer')
 -- require('java').setup({})
 
--- Prepare on_attach.
--- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
-local on_attach = function(client, bufnr)
-  local function buf_set_keymap(...)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', ...)
-  end
-  local lsp_buf = '<cmd>lua vim.lsp.buf.'
-  local options = { noremap = true, silent = true }
+-- Use LspAttach autocommand after the language server attaches to the current buffer.
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(ev)
+    local opts = { buffer = ev.buf }
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
 
-  -- Add some keymapping.
-  buf_set_keymap('gr', lsp_buf .. 'rename()<cr>', options)
-  buf_set_keymap('K', lsp_buf .. 'hover()<cr>', options)
-  buf_set_keymap('<leader>a', lsp_buf .. 'code_action()<cr>', options)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.rename, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, opts)
 
-  if client.server_capabilities.inlayHintProvider then
-    vim.lsp.inlay_hint.enable(true)
-  end
-end
+    -- Enable inlay hints if supported.
+    if client and client.server_capabilities.inlayHintProvider then
+      vim.lsp.inlay_hint.enable(true)
+    end
+  end,
+})
 
 -- Prepare capabilities.
 -- local capabilities = require('cmp_nvim_lsp').default_capabilities()
@@ -614,85 +612,73 @@ mason_tool_installer.setup({
   ensure_installed = ensure_installed,
 })
 
+-- Specific rust-analyzer setup.
+vim.lsp.config('rust_analyzer', {
+  capabilities = capabilities,
+  settings = {
+    ['rust-analyzer'] = {
+      cargo = {
+        features = 'all',
+      },
+      check = {
+        command = 'clippy',
+      },
+      interpret = {
+        tests = true,
+      },
+    },
+  },
+})
+
+-- Specific tsserver setup.
+local inlayHints = {
+  includeInlayParameterNameHints = 'all',
+  includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+  includeInlayFunctionParameterTypeHints = true,
+  includeInlayVariableTypeHints = true,
+  includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+  includeInlayPropertyDeclarationTypeHints = true,
+  includeInlayFunctionLikeReturnTypeHints = true,
+  includeInlayEnumMemberValueHints = true,
+}
+
+vim.lsp.config('ts_ls', {
+  capabilities = capabilities,
+  filetypes = {
+    'javascript',
+    'javascriptreact',
+    'typescript',
+    'typescriptreact',
+    'vue',
+  },
+  init_options = {
+    plugins = {
+      {
+        name = '@vue/typescript-plugin',
+        location = '/usr/lib/node_modules/@vue/typescript-plugin',
+        languages = { 'javascript', 'typescript', 'vue' },
+      },
+    },
+  },
+  settings = {
+    importModuleSpecifierPreference = 'non-relative',
+    typescript = {
+      inlayHints = inlayHints,
+    },
+    javascript = {
+      inlayHints = inlayHints,
+    },
+  },
+})
+
 -- Setup all installed servers.
-for _, server in ipairs(mason_lspconfig.get_installed_servers()) do
-  if server == 'tsserver' then
-    server = 'ts_ls'
-  end
-
-  -- Specific rust-analyzer setup.
-  if server == 'rust_analyzer' then
-    vim.lsp.config(server, {
-      on_attach = on_attach,
-      capabilities = capabilities,
-      settings = {
-        ['rust-analyzer'] = {
-          cargo = {
-            features = 'all',
-          },
-          check = {
-            command = 'clippy',
-          },
-          interpret = {
-            tests = true,
-          },
-        },
-      },
-    })
-  elseif server == 'ts_ls' then
-    -- Specific tsserver setup.
-    local inlayHints = {
-      includeInlayParameterNameHints = 'all',
-      includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-      includeInlayFunctionParameterTypeHints = true,
-      includeInlayVariableTypeHints = true,
-      includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-      includeInlayPropertyDeclarationTypeHints = true,
-      includeInlayFunctionLikeReturnTypeHints = true,
-      includeInlayEnumMemberValueHints = true,
-    }
-
-    vim.lsp.config(server, {
-      on_attach = on_attach,
-      capabilities = capabilities,
-      filetypes = {
-        'javascript',
-        'javascriptreact',
-        'typescript',
-        'typescriptreact',
-        'vue',
-      },
-      init_options = {
-        plugins = {
-          {
-            name = '@vue/typescript-plugin',
-            location = '/usr/lib/node_modules/@vue/typescript-plugin',
-            languages = { 'javascript', 'typescript', 'vue' },
-          },
-        },
-      },
-      settings = {
-        importModuleSpecifierPreference = 'non-relative',
-        typescript = {
-          inlayHints = inlayHints,
-        },
-        javascript = {
-          inlayHints = inlayHints,
-        },
-      },
-    })
-  else
-    vim.lsp.config(server, {
-      on_attach = on_attach,
-      capabilities = capabilities,
-    })
-  end
-end
+vim.lsp.config('*', {
+  capabilities = capabilities,
+})
 
 -- Provide a generic function to configure and enable servers not managed by Mason.
 local config_and_enable = function(server, more_settings)
   local config = {
-    on_attach = on_attach,
     capabilities = capabilities,
   }
 
@@ -709,7 +695,6 @@ end
 -- Specific zls setup.
 -- This LSP is not managed by Mason but by zvm.
 config_and_enable('zls', {
-  on_attach = on_attach,
   capabilities = capabilities,
   settings = {
     warn_style = true,
