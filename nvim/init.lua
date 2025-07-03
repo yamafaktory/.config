@@ -574,7 +574,6 @@ local ensure_installed = {
   'stylua',
   'tailwindcss-language-server',
   'taplo',
-  'typescript-language-server',
   'vtsls',
   'vue-language-server',
   'yaml-language-server',
@@ -614,47 +613,6 @@ vim.lsp.config('rust_analyzer', {
       interpret = {
         tests = true,
       },
-    },
-  },
-})
-
--- Specific tsserver setup.
-local inlayHints = {
-  includeInlayParameterNameHints = 'all',
-  includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-  includeInlayFunctionParameterTypeHints = true,
-  includeInlayVariableTypeHints = true,
-  includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-  includeInlayPropertyDeclarationTypeHints = true,
-  includeInlayFunctionLikeReturnTypeHints = true,
-  includeInlayEnumMemberValueHints = true,
-}
-
-vim.lsp.config('ts_ls', {
-  capabilities = capabilities,
-  filetypes = {
-    'javascript',
-    'javascriptreact',
-    'typescript',
-    'typescriptreact',
-    'vue',
-  },
-  init_options = {
-    plugins = {
-      {
-        name = '@vue/typescript-plugin',
-        location = '/usr/lib/node_modules/@vue/typescript-plugin',
-        languages = { 'javascript', 'typescript', 'vue' },
-      },
-    },
-  },
-  settings = {
-    importModuleSpecifierPreference = 'non-relative',
-    typescript = {
-      inlayHints = inlayHints,
-    },
-    javascript = {
-      inlayHints = inlayHints,
     },
   },
 })
@@ -705,9 +663,26 @@ local vue_plugin = {
   languages = { 'vue' },
   configNamespace = 'typescript',
 }
+local shared_settings = {
+  suggest = { completeFunctionCalls = true },
+  inlayHints = {
+    functionLikeReturnTypes = { enabled = true },
+    parameterNames = { enabled = 'all' },
+    parameterTypes = { enabled = true },
+    propertyDeclarationTypes = { enabled = true },
+    variableTypes = { enabled = true },
+  },
+}
 local vtsls_config = {
   settings = {
+    typescript = shared_settings,
+    javascript = shared_settings,
     vtsls = {
+      experimental = {
+        completion = {
+          enableServerSideFuzzyMatch = true,
+        },
+      },
       tsserver = {
         globalPlugins = {
           vue_plugin,
