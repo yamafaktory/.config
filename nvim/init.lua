@@ -535,6 +535,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     local opts = { buffer = ev.buf }
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    local bufnr = ev.buf
+    local filetype = vim.bo[bufnr].filetype
 
     vim.keymap.set('n', 'gr', vim.lsp.buf.rename, opts)
     vim.keymap.set('n', 'K', function()
@@ -544,7 +546,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     -- Enable inlay hints if supported.
     if client and client.server_capabilities.inlayHintProvider then
-      vim.lsp.inlay_hint.enable(true)
+      -- Currently inlay hints with vue are broken.
+      if filetype == 'vue' then
+        vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
+      else
+        vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+      end
     end
   end,
 })
@@ -584,7 +591,7 @@ mason.setup()
 
 ---@diagnostic disable-next-line: missing-fields
 mason_lspconfig.setup({
-  automatic_enable = true,
+  automatic_enable = { exclude = { 'vue_ls' } },
   ui = {
     icons = {
       server_installed = '',
@@ -653,7 +660,7 @@ config_and_enable('postgres_lsp')
 
 -- Vue setup.
 -- https://github.com/vuejs/language-tools/wiki/Neovim
--- sudo npm install -g @vue/typescript-plugin@v2.2.12
+-- sudo npm install -g @vue/typescript-plugin
 local vue_language_server_path = vim.fn.expand('$MASON/packages')
   .. '/vue-language-server'
   .. '/node_modules/@vue/language-server'
@@ -699,6 +706,7 @@ local vtsls_config = {
   },
 }
 local vue_ls_config = {
+  capabilities = capabilities,
   on_init = function(client)
     client.handlers['tsserver/request'] = function(_, result, context)
       local clients =
