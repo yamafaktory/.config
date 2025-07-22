@@ -124,14 +124,22 @@ local packages = {
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
       require('fzf-lua').setup({
+        'hide',
         winopts = {
           border = 'single',
           preview = { border = 'single' },
         },
       })
+
+      require('fzf-lua').register_ui_select()
     end,
     keys = {
-      { '<leader>b', '<cmd>FzfLua buffers<cr>', desc = 'Fzf buffers' },
+      { '<leader>z', '<cmd>FzfLua<cr>', desc = 'Fzf' },
+      {
+        '<leader>b',
+        '<cmd>FzfLua buffers resume=true<cr>',
+        desc = 'Fzf buffers',
+      },
       {
         '<leader>d',
         function()
@@ -139,19 +147,16 @@ local packages = {
         end,
         desc = 'Fzf lsp definitions',
       },
-      { '<leader>f', '<cmd>FzfLua files<cr>', desc = 'Fzf files' },
+      { '<leader>f', '<cmd>FzfLua files resume=true<cr>', desc = 'Fzf files' },
       {
         '<leader>g',
         function()
-          require('fzf-lua').live_grep({ exec_empty_query = true })
+          require('fzf-lua').live_grep({
+            exec_empty_query = true,
+            resume = true,
+          })
         end,
-
         desc = 'Fzf live grep',
-      },
-      {
-        '<leader>r',
-        '<cmd>FzfLua live_grep_resume<cr>',
-        desc = 'Fzf live grep resume',
       },
     },
   },
