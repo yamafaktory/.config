@@ -388,37 +388,31 @@ local packages = {
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
     cmd = { 'ConformInfo' },
-    keys = {
-      {
-        '<leader><space>',
-        function()
-          require('conform').format({ async = true })
-        end,
-        mode = '',
-        desc = 'Format buffer',
-      },
+    format_on_save = {
+      timeout_ms = 500,
+      lsp_format = 'fallback',
     },
     ---@module "conform"
     ---@type conform.setupOpts
     opts = {
       formatters_by_ft = (function()
-        local prettierFormatter =
-          { 'prettierd', 'prettier', stop_after_first = true }
+        local formatter =
+          { 'dprint', 'prettier', 'prettierd', stop_after_first = true }
 
         return {
-          css = prettierFormatter,
-          html = prettierFormatter,
-          javascript = prettierFormatter,
-          json = prettierFormatter,
-          jsonc = prettierFormatter,
+          css = formatter,
+          html = formatter,
+          javascript = formatter,
+          json = formatter,
+          jsonc = formatter,
           lua = { 'stylua' },
-          markdown = prettierFormatter,
+          markdown = formatter,
           rust = { 'rustfmt', lsp_format = 'fallback' },
-          scss = prettierFormatter,
-          typescript = prettierFormatter,
-          typescriptreact = prettierFormatter,
-          vue = prettierFormatter,
-          yaml = prettierFormatter,
+          scss = formatter,
+          typescript = formatter,
+          typescriptreact = formatter,
+          vue = formatter,
+          yaml = formatter,
           zig = { 'zigfmt' },
         }
       end)(),
@@ -445,6 +439,13 @@ local packages = {
     },
     init = function()
       vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        pattern = '*',
+        callback = function(args)
+          require('conform').format({ bufnr = args.buf })
+        end,
+      })
     end,
   },
 
