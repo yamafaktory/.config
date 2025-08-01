@@ -402,6 +402,7 @@ local packages = {
         return {
           css = formatter,
           html = formatter,
+          java = { 'google-java-format' },
           javascript = formatter,
           json = formatter,
           jsonc = formatter,
@@ -409,6 +410,7 @@ local packages = {
           markdown = formatter,
           rust = { 'rustfmt', lsp_format = 'fallback' },
           scss = formatter,
+          sql = { 'pg_format' },
           typescript = formatter,
           typescriptreact = formatter,
           vue = formatter,
@@ -420,6 +422,9 @@ local packages = {
         lsp_format = 'fallback',
       },
       formatters = {
+        ['google-java-format'] = {
+          prepend_args = { '--aosp' },
+        },
         stylua = {
           prepend_args = {
             '--no-editorconfig',
@@ -573,13 +578,14 @@ local ensure_installed = {
   'css-lsp',
   'dockerfile-language-server',
   'eslint-lsp',
+  'google-java-format',
   'gradle-language-server',
   'html-lsp',
   'jdtls',
   'json-lsp',
   'just-lsp',
   'lua-language-server',
-  'oxlint',
+  'pgformatter',
   'postgrestools',
   'prettier',
   'rust-analyzer',
