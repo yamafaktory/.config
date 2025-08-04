@@ -25,6 +25,7 @@ vim.o.termguicolors = true
 vim.o.updatetime = 50
 vim.opt.clipboard = 'unnamedplus'
 vim.opt.cursorline = true
+vim.opt.endofline = false
 vim.opt.undofile = true
 vim.wo.number = true
 vim.wo.signcolumn = 'yes'
@@ -402,7 +403,6 @@ local packages = {
         return {
           css = formatter,
           html = formatter,
-          java = { 'google-java-format' },
           javascript = formatter,
           json = formatter,
           jsonc = formatter,
@@ -410,6 +410,7 @@ local packages = {
           markdown = formatter,
           rust = { 'rustfmt', lsp_format = 'fallback' },
           scss = formatter,
+          sh = { 'shfmt' },
           sql = { 'pg_format' },
           typescript = formatter,
           typescriptreact = formatter,
@@ -422,9 +423,6 @@ local packages = {
         lsp_format = 'fallback',
       },
       formatters = {
-        ['google-java-format'] = {
-          prepend_args = { '--aosp' },
-        },
         stylua = {
           prepend_args = {
             '--no-editorconfig',
@@ -578,18 +576,22 @@ local ensure_installed = {
   'css-lsp',
   'dockerfile-language-server',
   'eslint-lsp',
-  'google-java-format',
   'gradle-language-server',
   'html-lsp',
   'jdtls',
   'json-lsp',
   'just-lsp',
   'lua-language-server',
-  'pgformatter',
+  {
+    'pgformatter',
+    -- v5.6 is buggy
+    version = '5ebacff2df769b14e6f47d5dcba65c52c82ce098',
+  },
   'postgrestools',
   'prettier',
   'rust-analyzer',
   'shellcheck',
+  'shfmt',
   'stylua',
   'tailwindcss-language-server',
   'taplo',
@@ -604,7 +606,9 @@ mason.setup()
 ---@diagnostic disable-next-line: missing-fields
 mason_lspconfig.setup({
   automatic_enable = { exclude = { 'vue_ls' } },
+  auto_update = true,
   ui = {
+    check_outdated_packages_on_open = true,
     icons = {
       server_installed = '',
       server_pending = '',
