@@ -537,7 +537,6 @@ vim.diagnostic.config({
 local mason = require('mason')
 local mason_lspconfig = require('mason-lspconfig')
 local mason_tool_installer = require('mason-tool-installer')
--- require('java').setup({})
 
 -- Use LspAttach autocommand after the language server attaches to the current buffer.
 vim.api.nvim_create_autocmd('LspAttach', {
