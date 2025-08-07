@@ -531,6 +531,10 @@ vim.diagnostic.config({
   },
 })
 
+-- nvim-java requirements.
+require('java').setup()
+require('lspconfig').jdtls.setup({})
+
 -- Use Mason to manage the servers' setup.
 -- Each setup must stay in this specific order!
 -- See https://github.com/williamboman/mason-lspconfig.nvim#setup
