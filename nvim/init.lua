@@ -532,8 +532,15 @@ vim.diagnostic.config({
 })
 
 -- nvim-java requirements.
-require('java').setup()
-require('lspconfig').jdtls.setup({})
+-- Use a workaround to avoid the Mason interface at startup.
+-- https://github.com/mason-org/mason.nvim/issues/1857
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'java',
+  callback = function()
+    require('java').setup({})
+    require('lspconfig').jdtls.setup({})
+  end,
+})
 
 -- Use Mason to manage the servers' setup.
 -- Each setup must stay in this specific order!
