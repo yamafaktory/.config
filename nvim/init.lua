@@ -159,6 +159,13 @@ local packages = {
         end,
         desc = 'Fzf live grep',
       },
+      {
+        '<leader>r',
+        function()
+          require('fzf-lua').lsp_references({ jump1 = true })
+        end,
+        desc = 'Fzf lsp references',
+      },
     },
   },
 
@@ -472,10 +479,6 @@ local packages = {
       },
     },
   },
-
-  -- Java.
-  -- https://github.com/nvim-java/nvim-java/wiki/Lazyvim
-  'nvim-java/nvim-java',
 }
 
 require('lazy').setup({
@@ -529,17 +532,6 @@ vim.diagnostic.config({
       [vim.diagnostic.severity.INFO] = '',
     },
   },
-})
-
--- nvim-java requirements.
--- Use a workaround to avoid the Mason interface at startup.
--- https://github.com/mason-org/mason.nvim/issues/1857
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'java',
-  callback = function()
-    require('java').setup({})
-    require('lspconfig').jdtls.setup({})
-  end,
 })
 
 -- Use Mason to manage the servers' setup.

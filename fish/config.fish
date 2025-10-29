@@ -13,7 +13,9 @@ set -gx STARSHIP_LOG error
 starship init fish | source
 
 # Init Atuin.
-atuin init fish | source
+# Temporary fix until https://github.com/atuinsh/atuin/issues/2940 is versioned.
+# atuin init fish | source
+atuin init fish | sed "s/-k up/up/g" | source 
 
 # Bun.
 set --export BUN_INSTALL "$HOME/.bun"

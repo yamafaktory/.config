@@ -3,12 +3,14 @@
 cursor-style-blink = false
 font-size = 15
 fullscreen = true
+gtk-single-instance = true
 gtk-tabs-location = hidden
 mouse-hide-while-typing = true
 resize-overlay = never
 shell-integration-features = no-cursor
 theme = rose-pine-moon 
 window-decoration = false
+window-padding-color = extend-always
 window-padding-x = 0
 window-padding-y = 0
 # Create splits.
