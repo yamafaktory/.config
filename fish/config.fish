@@ -27,6 +27,9 @@ set PATH $PATH ~/.cargo/bin
 # Zvm bin.
 set PATH $PATH ~/.zvm/bin
 
+# Neovim Mason bin.
+set -gx PATH $HOME/.local/share/nvim/mason/bin $PATH
+
 # Rosé Pine Moon theme. 
 # syntax highlighting variables
 set -l fish_color_normal e0def4
