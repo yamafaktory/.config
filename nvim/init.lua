@@ -128,10 +128,26 @@ local packages = {
         'hide',
         winopts = {
           border = 'single',
-          preview = { border = 'single' },
+          fullscreen = true,
+          preview = {
+            border = 'single',
+            -- Using default settings.
+            winopts = {
+              cursorcolumn = false,
+              cursorline = true,
+              cursorlineopt = 'both',
+              foldenable = false,
+              foldmethod = 'manual',
+              list = false,
+              number = true,
+              relativenumber = false,
+              scrolloff = 0,
+              signcolumn = 'no',
+              winblend = 1,
+            },
+          },
         },
       })
-
       require('fzf-lua').register_ui_select()
     end,
     keys = {
@@ -584,12 +600,8 @@ local ensure_installed = {
   'json-lsp',
   'just-lsp',
   'lua-language-server',
-  {
-    'pgformatter',
-    -- v5.6 is buggy
-    version = '5ebacff2df769b14e6f47d5dcba65c52c82ce098',
-  },
-  'postgrestools',
+  'pgformatter',
+  'postgres-language-server',
   'prettier',
   'rust-analyzer',
   'shellcheck',
@@ -674,6 +686,7 @@ config_and_enable('zls', {
 
 -- Enable some other language servers.
 config_and_enable('just')
+-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#postgres_lsp
 config_and_enable('postgres_lsp')
 
 -- Vue setup.
