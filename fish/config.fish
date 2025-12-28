@@ -1,35 +1,41 @@
+# CachyOS config
 source /usr/share/cachyos-fish-config/cachyos-config.fish
 
-# Remove greeting message.
+# Remove greeting message
 function fish_greeting
 end
 
-# Default editor.
+# Default editor
 set -gx EDITOR nvim
 set -gx VISUAL $EDITOR
 
-# GPG fix.
+# GPG fix
 set -gx GPG_TTY (tty)
 
-# Init Starship.
+# Init Starship
 set -gx STARSHIP_LOG error
 starship init fish | source
 
-# Init Atuin.
+# Init Atuin
 atuin init fish | source
 
-# Bun.
+# Bun
 set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
 
-# Cargo bin.
+# Cargo bin
 set PATH $PATH ~/.cargo/bin
 
-# Zvm bin.
+# Zvm bin
 set PATH $PATH ~/.zvm/bin
 
-# Neovim Mason bin.
+# Neovim Mason bin
 set -gx PATH $HOME/.local/share/nvim/mason/bin $PATH
+
+# SSH agent
+if not set -q SSH_AUTH_SOCK
+    eval (ssh-agent -c) > /dev/null
+end
 
 # Rose Pine Moon theme for fish
 # https://rosepinetheme.com
