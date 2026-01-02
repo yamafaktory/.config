@@ -29,3 +29,7 @@ niri/*
 nvim/*
 !nvim/init.lua
 !nvim/lazy-lock.json
+
+!wofi/
+wofi/*
+!wofi/config
