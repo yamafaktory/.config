@@ -3,18 +3,28 @@
 
 # Whitelist some files.
 !.gitignore
+
 !atuin/
 atuin/*
 !atuin/config.toml
+
 !bat/
 bat/*
 !bat/config
+
 !fish/
 fish/*
 !fish/config.fish
+
 !ghostty/
 ghostty/*
 !ghostty/config
+
+!niri/
+niri/*
+!niri/config.kdl
+!niri/noctalia.kdl
+
 !nvim/
 nvim/*
 !nvim/init.lua

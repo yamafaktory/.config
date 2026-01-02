@@ -604,7 +604,6 @@ local ensure_installed = {
   'eslint-lsp',
   'gradle-language-server',
   'html-lsp',
-  'jdtls',
   'json-lsp',
   'just-lsp',
   'lua-language-server',
