@@ -285,34 +285,19 @@ local packages = {
       'moyiz/blink-emoji.nvim', -- Emojis completion.
     },
     version = '*',
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
     opts = {
       completion = {
         documentation = {
           auto_show = true,
-        },
-        list = {
-          selection = { preselect = false },
-        },
-        menu = {
-          auto_show = function(ctx)
-            return ctx.mode ~= 'default'
-          end,
-          draw = {
-            columns = {
-              { 'kind_icon' },
-              { 'label', 'label_description', gap = 1 },
-              { 'kind' },
-              { 'source_name' },
-            },
-            treesitter = { 'lsp' },
-          },
         },
         ghost_text = {
           enabled = true,
         },
       },
       keymap = {
-        preset = 'enter',
+        preset = 'default',
       },
       appearance = {
         nerd_font_variant = 'mono',
@@ -482,27 +467,6 @@ local packages = {
       })
     end,
   },
-
-  -- Codeium.
-  {
-    'monkoose/neocodeium',
-    event = 'VeryLazy',
-    config = true,
-    keys = {
-      {
-        '<A-f>',
-        '<cmd>lua require("neocodeium").accept()<cr>',
-        desc = 'Neocodeium accept',
-        mode = 'i',
-      },
-      {
-        '<A-e>',
-        '<cmd>lua require("neocodeium").cycle_or_complete()<cr>',
-        desc = 'Neocodeium cycle',
-        mode = 'i',
-      },
-    },
-  },
 }
 
 require('lazy').setup({
@@ -521,23 +485,6 @@ require('lazy').setup({
 -- Diagnostics configuration.
 vim.diagnostic.config({
   update_in_insert = true,
-})
-
--- Neocodeium auto-completion settings.
-local neocodeium = require('neocodeium')
-local blink = require('blink.cmp')
-
-vim.api.nvim_create_autocmd('User', {
-  pattern = 'BlinkCmpMenuOpen',
-  callback = function()
-    neocodeium.clear()
-  end,
-})
-
-neocodeium.setup({
-  filter = function()
-    return not blink.is_visible()
-  end,
 })
 
 -- Use nice icons for diagnostics.
