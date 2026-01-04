@@ -1,7 +1,0 @@
-allow_images=true
-hide_scroll=true
-no_actions=false
-term=ghostty
-mode=drun
-layer=overlay
---show

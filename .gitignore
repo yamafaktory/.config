@@ -25,11 +25,9 @@ niri/*
 !niri/config.kdl
 !niri/noctalia.kdl
 
+!noctalia
+
 !nvim/
 nvim/*
 !nvim/init.lua
 !nvim/lazy-lock.json
-
-!wofi/
-wofi/*
-!wofi/config
