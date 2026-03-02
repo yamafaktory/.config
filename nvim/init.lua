@@ -5,7 +5,6 @@
 vim.g.markdown_fenced_languages = {
   'bash',
   'html',
-  'java',
   'javascript',
   'javascriptreact',
   'json',
@@ -611,6 +610,19 @@ vim.lsp.config('rust_analyzer', {
 -- Setup all installed servers.
 vim.lsp.config('*', {
   capabilities = capabilities,
+})
+
+-- Workaround for lua_ls 3.17+ not picking up lazydev workspace libraries
+-- on the first buffer due to a race condition in initialization timing.
+-- See https://github.com/folke/lazydev.nvim/issues/136
+vim.lsp.config('lua_ls', {
+  settings = {
+    Lua = {
+      workspace = {
+        library = vim.api.nvim_get_runtime_file('', true),
+      },
+    },
+  },
 })
 
 -- Provide a generic function to configure and enable servers not managed by Mason.

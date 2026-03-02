@@ -25,7 +25,11 @@ niri/*
 !niri/config.kdl
 !niri/noctalia.kdl
 
-!noctalia
+!noctalia/
+noctalia/*
+!noctalia/colors.json
+!noctalia/plugins.json
+!noctalia/settings.json
 
 !nvim/
 nvim/*
