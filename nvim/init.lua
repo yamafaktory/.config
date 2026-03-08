@@ -75,13 +75,7 @@ local packages = {
   },
 
   -- Plenary lua functions.
-  {
-    'nvim-lua/plenary.nvim',
-    dependencies = {
-      'Saecki/crates.nvim',
-      'lewis6991/gitsigns.nvim',
-    },
-  },
+  'nvim-lua/plenary.nvim',
 
   -- Icons.
   {
@@ -106,9 +100,7 @@ local packages = {
   {
     'echasnovski/mini.files',
     version = false,
-    config = function()
-      require('mini.files').setup({})
-    end,
+    opts = {},
     keys = {
       {
         '<leader>t',
@@ -196,7 +188,6 @@ local packages = {
   {
     'lewis6991/gitsigns.nvim',
     config = true,
-    lazy = true,
     keys = {
       {
         '<leader>l',
@@ -221,7 +212,6 @@ local packages = {
     config = function()
       local configs = require('nvim-treesitter')
 
-      ---@diagnostic disable-next-line: missing-fields
       configs.setup({
         ensure_installed = {
           'bash',
@@ -244,21 +234,21 @@ local packages = {
           'typescript',
           'vim',
           'yaml',
-          'vue',
           'zig',
         },
         highlight = {
           additional_vim_regex_highlighting = false,
-          autotag = { enable = true },
           enable = true,
-          indent = { enable = true },
+        },
+        indent = { enable = true },
+        incremental_selection = {
+          enable = true,
           keymaps = {
             init_selection = 'gnn',
             node_decremental = 'grm',
             node_incremental = 'grn',
             scope_incremental = 'grc',
           },
-          matchup = { enable = true },
         },
       })
     end,
@@ -360,6 +350,17 @@ local packages = {
     },
   },
 
+  -- Keybinding hints.
+  {
+    'folke/which-key.nvim',
+    event = 'VeryLazy',
+    opts = {
+      spec = {
+        { '<leader>x', group = 'diagnostics' },
+      },
+    },
+  },
+
   -- Current theme.
   {
     'rose-pine/neovim',
@@ -379,18 +380,21 @@ local packages = {
     'Saecki/crates.nvim',
     event = { 'BufRead Cargo.toml' },
     config = true,
-    lazy = true,
   },
 
   -- Auto-close pairs.
   {
     'echasnovski/mini.pairs',
     event = 'VeryLazy',
-    lazy = true,
+    opts = {},
   },
 
-  -- Auto-close tags.
-  'windwp/nvim-ts-autotag',
+  -- Surround motions (sa/sd/sr).
+  {
+    'echasnovski/mini.surround',
+    event = 'VeryLazy',
+    opts = {},
+  },
 
   -- Indentation guides.
   {
@@ -402,11 +406,15 @@ local packages = {
   -- Formatting.
   {
     'stevearc/conform.nvim',
-    event = { 'BufWritePre' },
     cmd = { 'ConformInfo' },
-    format_on_save = {
-      timeout_ms = 500,
-      lsp_format = 'fallback',
+    keys = {
+      {
+        '<leader>p',
+        function()
+          require('conform').format({ async = true })
+        end,
+        desc = 'Format buffer',
+      },
     },
     ---@module "conform"
     ---@type conform.setupOpts
@@ -429,7 +437,6 @@ local packages = {
           sql = { 'pg_format' },
           typescript = formatter,
           typescriptreact = formatter,
-          vue = formatter,
           yaml = formatter,
           zig = { 'zigfmt' },
         }
@@ -457,13 +464,6 @@ local packages = {
     },
     init = function()
       vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-
-      vim.api.nvim_create_autocmd('BufWritePre', {
-        pattern = '*',
-        callback = function(args)
-          require('conform').format({ bufnr = args.buf })
-        end,
-      })
     end,
   },
 }
@@ -484,10 +484,6 @@ require('lazy').setup({
 -- Diagnostics configuration.
 vim.diagnostic.config({
   update_in_insert = true,
-})
-
--- Use nice icons for diagnostics.
-vim.diagnostic.config({
   signs = {
     text = {
       [vim.diagnostic.severity.ERROR] = '',
@@ -517,7 +513,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local opts = { buffer = ev.buf }
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     local bufnr = ev.buf
-    local filetype = vim.bo[bufnr].filetype
 
     vim.keymap.set('n', 'gr', vim.lsp.buf.rename, opts)
     vim.keymap.set('n', 'K', function()
@@ -527,12 +522,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     -- Enable inlay hints if supported.
     if client and client.server_capabilities.inlayHintProvider then
-      -- Currently inlay hints with vue are broken.
-      if filetype == 'vue' then
-        vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
-      else
-        vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-      end
+      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
     end
   end,
 })
@@ -562,18 +552,12 @@ local ensure_installed = {
   'stylua',
   'tailwindcss-language-server',
   'taplo',
-  'vtsls',
-  'vue-language-server',
+  'tsgo',
   'yaml-language-server',
   'yamllint',
 }
 
-mason.setup()
-
----@diagnostic disable-next-line: missing-fields
-mason_lspconfig.setup({
-  automatic_enable = { exclude = { 'vue_ls' } },
-  auto_update = true,
+mason.setup({
   ui = {
     check_outdated_packages_on_open = true,
     icons = {
@@ -584,6 +568,11 @@ mason_lspconfig.setup({
   },
 })
 
+mason_lspconfig.setup({
+  automatic_enable = true,
+  auto_update = true,
+})
+
 mason_tool_installer.setup({
   auto_update = true,
   ensure_installed = ensure_installed,
@@ -591,7 +580,6 @@ mason_tool_installer.setup({
 
 -- Specific rust-analyzer setup.
 vim.lsp.config('rust_analyzer', {
-  capabilities = capabilities,
   settings = {
     ['rust-analyzer'] = {
       cargo = {
@@ -625,48 +613,16 @@ vim.lsp.config('lua_ls', {
   },
 })
 
--- Provide a generic function to configure and enable servers not managed by Mason.
-local config_and_enable = function(server, more_settings)
-  local config = {
-    capabilities = capabilities,
-  }
-
-  if more_settings then
-    for k, v in pairs(more_settings) do
-      config[k] = v
-    end
-  end
-
-  vim.lsp.config(server, config)
-  vim.lsp.enable(server)
-end
-
 -- Specific zls setup.
 -- This LSP is not managed by Mason but by zvm.
-config_and_enable('zls', {
-  capabilities = capabilities,
+vim.lsp.config('zls', {
   settings = {
     warn_style = true,
   },
 })
+vim.lsp.enable('zls')
 
--- Enable some other language servers.
-config_and_enable('just')
--- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#postgres_lsp
-config_and_enable('postgres_lsp')
-
--- Vue setup.
--- https://github.com/vuejs/language-tools/wiki/Neovim
--- sudo npm install -g @vue/typescript-plugin
-local vue_language_server_path = vim.fn.expand('$MASON/packages')
-  .. '/vue-language-server'
-  .. '/node_modules/@vue/language-server'
-local vue_plugin = {
-  name = '@vue/typescript-plugin',
-  location = vue_language_server_path,
-  languages = { 'vue' },
-  configNamespace = 'typescript',
-}
+-- TypeScript/JavaScript setup via tsgo.
 local shared_settings = {
   suggest = { completeFunctionCalls = true },
   inlayHints = {
@@ -677,63 +633,9 @@ local shared_settings = {
     variableTypes = { enabled = true },
   },
 }
-local vtsls_config = {
+vim.lsp.config('tsgo', {
   settings = {
     typescript = shared_settings,
     javascript = shared_settings,
-    vtsls = {
-      experimental = {
-        completion = {
-          enableServerSideFuzzyMatch = true,
-        },
-      },
-      tsserver = {
-        globalPlugins = {
-          vue_plugin,
-        },
-      },
-    },
   },
-  filetypes = {
-    'typescript',
-    'javascript',
-    'javascriptreact',
-    'typescriptreact',
-    'vue',
-  },
-}
-local vue_ls_config = {
-  capabilities = capabilities,
-  on_init = function(client)
-    client.handlers['tsserver/request'] = function(_, result, context)
-      local clients =
-        vim.lsp.get_clients({ bufnr = context.bufnr, name = 'vtsls' })
-      if #clients == 0 then
-        vim.notify(
-          'Could not found `vtsls` lsp client, vue_lsp would not work without it.',
-          vim.log.levels.ERROR
-        )
-        return
-      end
-      local ts_client = clients[1]
-
-      local param = unpack(result)
-      local id, command, payload = unpack(param)
-      ts_client:exec_cmd({
-        title = 'tsserver/request',
-        command = 'typescript.tsserverRequest',
-        arguments = {
-          command,
-          payload,
-        },
-      }, { bufnr = context.bufnr }, function(_, r)
-        local response_data = { { id, r.body } }
-        ---@diagnostic disable-next-line: param-type-mismatch
-        client:notify('tsserver/response', response_data)
-      end)
-    end
-  end,
-}
-vim.lsp.config('vtsls', vtsls_config)
-vim.lsp.config('vue_ls', vue_ls_config)
-vim.lsp.enable({ 'vtsls', 'vue_ls' })
+})
