@@ -600,19 +600,6 @@ vim.lsp.config('*', {
   capabilities = capabilities,
 })
 
--- Workaround for lua_ls 3.17+ not picking up lazydev workspace libraries
--- on the first buffer due to a race condition in initialization timing.
--- See https://github.com/folke/lazydev.nvim/issues/136
-vim.lsp.config('lua_ls', {
-  settings = {
-    Lua = {
-      workspace = {
-        library = vim.api.nvim_get_runtime_file('', true),
-      },
-    },
-  },
-})
-
 -- Specific zls setup.
 -- This LSP is not managed by Mason but by zvm.
 vim.lsp.config('zls', {
