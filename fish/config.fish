@@ -37,6 +37,11 @@ if not set -q SSH_AUTH_SOCK
     eval (ssh-agent -c) > /dev/null
 end
 
+# Claude
+function claude-cf
+    CLAUDE_CONFIG_DIR=~/.claude-cf claude $argv
+end
+
 # Rose Pine Moon theme for fish
 # https://rosepinetheme.com
 # Syntax highlighting color variables
