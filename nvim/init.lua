@@ -99,15 +99,18 @@ vim.pack.add({
 })
 
 -- Auto-update plugins once per day in the background.
-vim.schedule(function()
-  local stamp = vim.fn.stdpath('data') .. '/vim-pack-last-update'
-  local stat = vim.uv.fs_stat(stamp)
-  local today = os.date('%Y-%m-%d')
-  if not stat or vim.fn.readfile(stamp)[1] ~= today then
-    vim.pack.update(nil, { force = true })
-    vim.fn.writefile({ today }, stamp)
-  end
-end)
+vim.api.nvim_create_autocmd('VimEnter', {
+  once = true,
+  callback = function()
+    local stamp = vim.fn.stdpath('data') .. '/vim-pack-last-update'
+    local stat = vim.uv.fs_stat(stamp)
+    local today = os.date('%Y-%m-%d')
+    if not stat or vim.fn.readfile(stamp)[1] ~= today then
+      vim.pack.update(nil, { force = true })
+      vim.fn.writefile({ today }, stamp)
+    end
+  end,
+})
 
 --[[
 -- Colorscheme.
@@ -228,37 +231,43 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Ensure parsers are installed. Skips already-installed ones.
 -- Requires the tree-sitter CLI; silently skips if not available.
 if vim.fn.executable('tree-sitter') == 1 then
-  vim.schedule(function()
-    require('nvim-treesitter.install').install({
-      'bash',
-      'css',
-      'dockerfile',
-      'fish',
-      'html',
-      'java',
-      'javascript',
-      'json',
-      'just',
-      'kdl',
-      'lua',
-      'markdown',
-      'rust',
-      'scss',
-      'sql',
-      'toml',
-      'tsx',
-      'typescript',
-      'vim',
-      'yaml',
-      'zig',
-    })
-  end)
+  vim.api.nvim_create_autocmd('VimEnter', {
+    once = true,
+    callback = function()
+      require('nvim-treesitter.install').install({
+        'bash',
+        'css',
+        'dockerfile',
+        'fish',
+        'html',
+        'java',
+        'javascript',
+        'json',
+        'just',
+        'kdl',
+        'lua',
+        'markdown',
+        'rust',
+        'scss',
+        'sql',
+        'toml',
+        'tsx',
+        'typescript',
+        'vim',
+        'yaml',
+        'zig',
+      })
+    end,
+  })
 end
 
 -- Run :TSUpdate automatically after nvim-treesitter is updated.
 vim.api.nvim_create_autocmd('PackChanged', {
   callback = function(ev)
-    if ev.data.spec.name == 'nvim-treesitter' and ev.data.kind == 'update' then
+    if
+      ev.data.spec.name == 'nvim-treesitter'
+      and (ev.data.kind == 'update' or ev.data.kind == 'install')
+    then
       vim.cmd('TSUpdate')
     end
   end,
@@ -405,18 +414,21 @@ require('ibl').setup()
 -- Loaded after startup to avoid blocking the initial render.
 --]]
 
-vim.schedule(function()
-  -- Keybinding hints.
-  require('which-key').setup({
-    spec = {
-      { '<leader>x', group = 'diagnostics' },
-    },
-  })
-  -- Auto-close pairs.
-  require('mini.pairs').setup()
-  -- Surround motions (sa/sd/sr).
-  require('mini.surround').setup()
-end)
+vim.api.nvim_create_autocmd('VimEnter', {
+  once = true,
+  callback = function()
+    -- Keybinding hints.
+    require('which-key').setup({
+      spec = {
+        { '<leader>x', group = 'diagnostics' },
+      },
+    })
+    -- Auto-close pairs.
+    require('mini.pairs').setup()
+    -- Surround motions (sa/sd/sr).
+    require('mini.surround').setup()
+  end,
+})
 
 --[[
 -- Filetype-deferred plugins.
