@@ -30,10 +30,11 @@ vim.o.ignorecase = true
 vim.o.shiftwidth = 2
 vim.o.smartcase = true
 vim.o.termguicolors = true
-vim.o.updatetime = 50
+vim.o.updatetime = 250
+-- Default border for all floating windows (hover, signature help, diagnostics).
+vim.o.winborder = 'single'
 vim.opt.clipboard = 'unnamedplus'
 vim.opt.cursorline = true
-vim.opt.endofline = false
 vim.opt.undofile = true
 vim.opt.number = true
 vim.opt.signcolumn = 'yes'
@@ -69,13 +70,11 @@ vim.pack.add({
   { src = 'https://github.com/moyiz/blink-emoji.nvim' },
   -- LSP client configurations.
   { src = 'https://github.com/neovim/nvim-lspconfig' },
-  -- Plenary Lua functions (required by several plugins).
-  { src = 'https://github.com/nvim-lua/plenary.nvim' },
   -- Status line.
   { src = 'https://github.com/nvim-lualine/lualine.nvim' },
   -- Icons (used by fzf-lua and others).
   { src = 'https://github.com/nvim-tree/nvim-web-devicons' },
-  -- Treesitter: highlight, indent, and incremental selection.
+  -- Treesitter: parser management (highlighting enabled per buffer below).
   { src = 'https://github.com/nvim-treesitter/nvim-treesitter' },
   -- Snippets library (used by blink.cmp).
   { src = 'https://github.com/rafamadriz/friendly-snippets' },
@@ -83,17 +82,21 @@ vim.pack.add({
   { src = 'https://github.com/rose-pine/neovim', name = 'rose-pine' },
   -- Rust Cargo.toml crate version hints.
   { src = 'https://github.com/Saecki/crates.nvim' },
-  -- Completion engine (version-pinned for stability).
-  -- Pin to a release tag so the pre-built native library (.so) is included.
-  { src = 'https://github.com/saghen/blink.cmp', version = 'v1.10.2' },
+  -- Completion engine.
+  -- Track 1.x release tags so the pre-built native library (.so) is included
+  -- while still picking up new releases.
+  {
+    src = 'https://github.com/saghen/blink.cmp',
+    version = vim.version.range('1'),
+  },
   -- Formatting.
   { src = 'https://github.com/stevearc/conform.nvim' },
   -- Mason tool installer (formatters, linters).
   { src = 'https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim' },
   -- Mason: LSP/formatter installer.
-  { src = 'https://github.com/williamboman/mason.nvim' },
+  { src = 'https://github.com/mason-org/mason.nvim' },
   -- Mason ↔ nvim-lspconfig bridge.
-  { src = 'https://github.com/williamboman/mason-lspconfig.nvim' },
+  { src = 'https://github.com/mason-org/mason-lspconfig.nvim' },
   -- Auto-close HTML/JSX tags (used by nvim-treesitter).
   { src = 'https://github.com/windwp/nvim-ts-autotag' },
 })
@@ -221,10 +224,14 @@ vim.keymap.set(
 -- Requires the tree-sitter CLI for compilation (paru -S tree-sitter-cli).
 --]]
 
--- Enable treesitter highlighting for any filetype that has a parser installed.
+-- Enable treesitter highlighting and indentation for any filetype that has
+-- a parser installed. Indent queries are experimental; if a language indents
+-- badly, gate the indentexpr behind a filetype check here.
 vim.api.nvim_create_autocmd('FileType', {
   callback = function()
-    pcall(vim.treesitter.start)
+    if pcall(vim.treesitter.start) then
+      vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    end
   end,
 })
 
@@ -247,6 +254,7 @@ if vim.fn.executable('tree-sitter') == 1 then
         'kdl',
         'lua',
         'markdown',
+        'markdown_inline',
         'rust',
         'scss',
         'sql',
@@ -423,6 +431,8 @@ vim.api.nvim_create_autocmd('VimEnter', {
         { '<leader>x', group = 'diagnostics' },
       },
     })
+    -- Filesystem explorer (highlight groups and sync autocommands).
+    require('mini.files').setup()
     -- Auto-close pairs.
     require('mini.pairs').setup()
     -- Surround motions (sa/sd/sr).
@@ -463,7 +473,8 @@ vim.api.nvim_create_autocmd('BufReadPost', {
 
 -- Diagnostics configuration.
 vim.diagnostic.config({
-  update_in_insert = true,
+  -- Inline diagnostics (off by default since 0.11).
+  virtual_text = true,
   signs = {
     text = {
       [vim.diagnostic.severity.ERROR] = '',
@@ -488,21 +499,15 @@ local mason_lspconfig = require('mason-lspconfig')
 local mason_tool_installer = require('mason-tool-installer')
 
 -- Use LspAttach autocommand after the language server attaches to the current buffer.
+-- Keymaps rely on the built-in defaults: grn (rename), gra (code action),
+-- grr (references), gri (implementation), grt (type definition), K (hover).
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
-    local opts = { buffer = ev.buf }
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    local bufnr = ev.buf
-
-    vim.keymap.set('n', 'gr', vim.lsp.buf.rename, opts)
-    vim.keymap.set('n', 'K', function()
-      vim.lsp.buf.hover({ border = 'single' })
-    end, opts)
-    vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, opts)
 
     -- Enable inlay hints if supported.
-    if client and client.server_capabilities.inlayHintProvider then
-      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+    if client and client:supports_method('textDocument/inlayHint') then
+      vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
     end
   end,
 })
@@ -550,7 +555,6 @@ mason.setup({
 
 mason_lspconfig.setup({
   automatic_enable = true,
-  auto_update = true,
 })
 
 mason_tool_installer.setup({
