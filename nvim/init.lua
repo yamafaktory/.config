@@ -528,6 +528,7 @@ local ensure_installed = {
   'json-lsp',
   'just-lsp',
   'lua-language-server',
+  'oxlint',
   'pgformatter',
   'postgres-language-server',
   'prettier',
@@ -610,3 +611,16 @@ vim.lsp.config('tsgo', {
     javascript = shared_settings,
   },
 })
+
+vim.lsp.config('oxlint', {
+  root_dir = function(bufnr, on_dir)
+    local config = vim.fs.find({ '.oxlintrc.json', '.oxlintrc.jsonc' }, {
+      path = vim.api.nvim_buf_get_name(bufnr),
+      upward = true,
+    })[1]
+    if config then
+      on_dir(vim.fs.dirname(config))
+    end
+  end,
+})
+vim.lsp.enable('oxlint')

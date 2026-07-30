@@ -12,12 +12,9 @@ set -gx VISUAL $EDITOR
 # GPG fix
 set -gx GPG_TTY (tty)
 
-# Init Starship
-set -gx STARSHIP_LOG error
-starship init fish | source
-
-# Init Atuin
-atuin init fish | source
+# Init whetuu
+fish_add_path /home/davy/dev/whetuu/zig-out/bin
+whetuu init fish | source
 
 # Bun
 set --export BUN_INSTALL "$HOME/.bun"
