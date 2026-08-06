@@ -1,0 +1,156 @@
+[shell.shadow]
+direction = "down_right"
+
+[theme]
+source = "community"
+community_palette = "Rose Pine Moon"
+custom_palette = "rose-pine"
+mode = "dark"
+
+[theme.templates]
+enable_builtin_templates = true
+builtin_ids = [ "gtk3", "gtk4", "qt", "kcolorscheme", "niri", "ghostty" ]
+
+[bar.default]
+position = "bottom"
+background_opacity = 0.0
+capsule = false
+border_width = 0.0
+concave_edge_corners = false
+margin_edge = 5
+margin_ends = 5
+radius = 12
+widget_spacing = 6
+start = [ "launcher", "clock", "cpu", "temp", "ram", "network_rx", "network_tx", "active_window", "media" ]
+center = [ "workspaces" ]
+end = [ "recorder", "tray", "notifications", "battery", "volume", "brightness", "control-center" ]
+
+[widget.clock]
+type = "clock"
+format = "{:%H:%M %a, %b %d}"
+
+[widget.active_window]
+type = "active_window"
+max_length = 145.0
+
+[widget.media]
+type = "media"
+max_length = 145.0
+
+[widget.recorder]
+type = "noctalia/screen_recorder:recorder"
+
+[plugins]
+auto_update = false
+enabled = [ "noctalia/screen_recorder" ]
+
+[control_center]
+show_shortcut_labels = true
+
+[[control_center.shortcuts]]
+type = "wifi"
+
+[[control_center.shortcuts]]
+type = "bluetooth"
+
+[[control_center.shortcuts]]
+type = "wallpaper"
+
+[[control_center.shortcuts]]
+type = "notification"
+
+[[control_center.shortcuts]]
+type = "power_profile"
+
+[[control_center.shortcuts]]
+type = "caffeine"
+
+[[control_center.shortcuts]]
+type = "nightlight"
+
+[shell.session]
+show_shortcuts = true
+
+[[shell.session.actions]]
+action = "lock"
+shortcut = "1"
+countdown_seconds = 10.0
+
+[[shell.session.actions]]
+action = "suspend"
+shortcut = "2"
+countdown_seconds = 10.0
+
+[[shell.session.actions]]
+action = "reboot"
+shortcut = "3"
+countdown_seconds = 10.0
+
+[[shell.session.actions]]
+action = "logout"
+shortcut = "4"
+countdown_seconds = 10.0
+
+[[shell.session.actions]]
+action = "shutdown"
+shortcut = "5"
+countdown_seconds = 10.0
+variant = "destructive"
+
+[dock]
+enabled = false
+
+[desktop_widgets]
+enabled = false
+
+[location]
+auto_locate = true
+
+[weather]
+enabled = true
+unit = "metric"
+
+[notification]
+background_opacity = 1.0
+position = "top_right"
+
+[osd]
+position = "top_right"
+
+[battery]
+warning_threshold = 20
+
+[brightness]
+enable_ddcutil = false
+sync_all_monitors = false
+
+[nightlight]
+enabled = false
+temperature_day = 6500
+temperature_night = 4000
+
+[idle.behavior.lock]
+enabled = false
+timeout = 660.0
+
+[idle.behavior.screen-off]
+enabled = false
+timeout = 600.0
+
+[idle.behavior.lock-and-suspend]
+enabled = false
+timeout = 1800.0
+
+[wallpaper]
+enabled = true
+directory = "/home/davy/Pictures"
+fill_mode = "crop"
+transition_duration = 1500.0
+edge_smoothness = 0.05
+transition_on_startup = false
+transition = [ "fade", "disc", "stripes", "wipe", "pixelate", "honeycomb" ]
+
+[wallpaper.automation]
+enabled = false
+interval_seconds = 300
+order = "random"

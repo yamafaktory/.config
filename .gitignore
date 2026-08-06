@@ -27,9 +27,10 @@ niri/*
 
 !noctalia/
 noctalia/*
-!noctalia/colors.json
-!noctalia/plugins.json
-!noctalia/settings.json
+!noctalia/config.toml
+!noctalia/palettes/
+noctalia/palettes/*
+!noctalia/palettes/*.json
 
 !nvim/
 nvim/*

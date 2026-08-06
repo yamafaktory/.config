@@ -39,7 +39,7 @@ binds {
 
     // ─── Applications ───
     MOD+RETURN                          hotkey-overlay-title="Open Terminal: ghostty" { spawn-sh "ghostty"; }
-    MOD+SPACE                           hotkey-overlay-title="Open App Launcher: noctalia" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
+    MOD+SPACE                           hotkey-overlay-title="Open App Launcher: noctalia" { spawn-sh "noctalia msg panel-toggle launcher"; }
     MOD+B                               hotkey-overlay-title="Open Browser: firefox" { spawn-sh "firefox"; }
     MOD+ALT+L                           hotkey-overlay-title="Lock Screen: swaylock" { spawn-sh "swaylock"; }
     
@@ -275,6 +275,6 @@ binds {
     }
 
     // ────────────── Noctalia ──────────────
-    spawn-at-startup "qs" "-c" "noctalia-shell"
+    spawn-at-startup "noctalia"
 
     include "./noctalia.kdl"
