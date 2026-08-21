@@ -11,33 +11,20 @@ vim.loader.enable()
 -- General options.
 --]]
 
-vim.g.markdown_fenced_languages = {
-  'bash',
-  'html',
-  'javascript',
-  'javascriptreact',
-  'json',
-  'rust',
-  'sh=bash',
-  'tsx=typescriptreact',
-  'typescript',
-  'typescriptreact',
-  'zig',
-}
 vim.o.breakindent = true
+vim.o.clipboard = 'unnamedplus'
 vim.o.completeopt = 'menu,menuone,noselect'
+vim.o.cursorline = true
 vim.o.ignorecase = true
+vim.o.number = true
 vim.o.shiftwidth = 2
+vim.o.signcolumn = 'yes'
 vim.o.smartcase = true
 vim.o.termguicolors = true
+vim.o.undofile = true
 vim.o.updatetime = 250
 -- Default border for all floating windows (hover, signature help, diagnostics).
 vim.o.winborder = 'single'
-vim.opt.clipboard = 'unnamedplus'
-vim.opt.cursorline = true
-vim.opt.undofile = true
-vim.opt.number = true
-vim.opt.signcolumn = 'yes'
 
 --[[
 -- Plugins.
@@ -241,7 +228,7 @@ if vim.fn.executable('tree-sitter') == 1 then
   vim.api.nvim_create_autocmd('VimEnter', {
     once = true,
     callback = function()
-      require('nvim-treesitter.install').install({
+      require('nvim-treesitter').install({
         'bash',
         'css',
         'dockerfile',
@@ -493,7 +480,7 @@ vim.diagnostic.config({
 
 -- Use Mason to manage the servers' setup.
 -- Each setup must stay in this specific order!
--- See https://github.com/williamboman/mason-lspconfig.nvim#setup
+-- See https://github.com/mason-org/mason-lspconfig.nvim#setup
 local mason = require('mason')
 local mason_lspconfig = require('mason-lspconfig')
 local mason_tool_installer = require('mason-tool-installer')
@@ -505,9 +492,23 @@ vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
 
+    if not client then
+      return
+    end
+
     -- Enable inlay hints if supported.
-    if client and client:supports_method('textDocument/inlayHint') then
+    if client:supports_method('textDocument/inlayHint') then
       vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+    end
+
+    -- Code lenses (off by default). Run one with grx.
+    if client:supports_method('textDocument/codeLens') then
+      vim.lsp.codelens.enable(true, { bufnr = ev.buf })
+    end
+
+    -- Mirror edits across linked ranges, e.g. JSX/HTML tag pairs (off by default).
+    if client:supports_method('textDocument/linkedEditingRange') then
+      vim.lsp.linked_editing_range.enable(true, { client_id = client.id })
     end
   end,
 })
@@ -538,7 +539,7 @@ local ensure_installed = {
   'stylua',
   'tailwindcss-language-server',
   'taplo',
-  'tsgo',
+  'tsc',
   'yaml-language-server',
   'yamllint',
 }
@@ -547,9 +548,9 @@ mason.setup({
   ui = {
     check_outdated_packages_on_open = true,
     icons = {
-      server_installed = '',
-      server_pending = '',
-      server_uninstalled = '',
+      package_installed = '',
+      package_pending = '',
+      package_uninstalled = '',
     },
   },
 })
@@ -594,21 +595,19 @@ vim.lsp.config('zls', {
 })
 vim.lsp.enable('zls')
 
--- TypeScript/JavaScript setup via tsgo.
-local shared_settings = {
-  suggest = { completeFunctionCalls = true },
-  inlayHints = {
-    functionLikeReturnTypes = { enabled = true },
-    parameterNames = { enabled = 'all' },
-    parameterTypes = { enabled = true },
-    propertyDeclarationTypes = { enabled = true },
-    variableTypes = { enabled = true },
-  },
-}
-vim.lsp.config('tsgo', {
+-- TypeScript/JavaScript setup via tsc.
+vim.lsp.config('tsc', {
   settings = {
-    typescript = shared_settings,
-    javascript = shared_settings,
+    ['js/ts'] = {
+      suggest = { completeFunctionCalls = true },
+      inlayHints = {
+        functionLikeReturnTypes = { enabled = true },
+        parameterNames = { enabled = 'all' },
+        parameterTypes = { enabled = true },
+        propertyDeclarationTypes = { enabled = true },
+        variableTypes = { enabled = true },
+      },
+    },
   },
 })
 
