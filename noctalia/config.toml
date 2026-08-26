@@ -41,7 +41,7 @@ max_length = 145.0
 type = "noctalia/screen_recorder:recorder"
 
 [plugins]
-auto_update = false
+auto_update = "none"
 enabled = [ "noctalia/screen_recorder" ]
 
 [control_center]
