@@ -34,6 +34,31 @@ if not set -q SSH_AUTH_SOCK
     eval (ssh-agent -c) > /dev/null
 end
 
+function key_unlock
+    set -l gpg_keys (gpg --with-colons --list-secret-keys 2>/dev/null | awk -F: '/^sec/ { s = 1; next } s && /^fpr/ { print $10; s = 0 }')
+    set -l ssh_keys (string replace -r '\.pub$' '' ~/.ssh/*.pub)
+    set -l lock (set -q XDG_RUNTIME_DIR; and echo $XDG_RUNTIME_DIR; or echo /tmp)/key-unlock-$USER.lock
+
+    for fpr in $gpg_keys
+        echo | gpg --quiet --batch --pinentry-mode error --local-user $fpr --clearsign >/dev/null 2>&1; and continue
+        set -l uid (gpg --with-colons --list-secret-keys $fpr 2>/dev/null | string match -r '^uid:[^:]*:(?:[^:]*:){7}([^:]*)' | sed -n 2p)
+        echo "Unlocking GPG key for $uid"
+        echo | flock -n $lock gpg --quiet --local-user $fpr --clearsign >/dev/null 2>&1
+    end
+
+    set -l loaded (ssh-add -l 2>/dev/null | string split -f2 ' ')
+    for key in $ssh_keys
+        test -f $key; or continue
+        set -l fp (ssh-keygen -lf $key.pub 2>/dev/null | string split -f2 ' ')
+        contains -- $fp $loaded; and continue
+        flock -n $lock ssh-add -q -t 86400 $key
+    end
+end
+
+if status is-interactive; and isatty stdin
+    key_unlock
+end
+
 # Claude
 function claude-cf
     CLAUDE_CONFIG_DIR=~/.claude-cf claude $argv
