@@ -154,3 +154,6 @@ transition = [ "fade", "disc", "stripes", "wipe", "pixelate", "honeycomb" ]
 enabled = false
 interval_seconds = 300
 order = "random"
+
+[audio]
+enable_sounds = false
