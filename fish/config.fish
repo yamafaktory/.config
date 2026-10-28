@@ -63,6 +63,7 @@ end
 function claude-cf
     CLAUDE_CONFIG_DIR=~/.claude-cf claude $argv
 end
+alias tower ~/.claude-cf/bin/tower
 
 # Rose Pine Moon theme for fish
 # https://rosepinetheme.com
