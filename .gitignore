@@ -3,6 +3,7 @@
 
 # Whitelist some files.
 !.gitignore
+!README.md
 
 !bat/
 bat/*
