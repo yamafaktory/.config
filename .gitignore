@@ -37,3 +37,9 @@ nvim/*
 git/*
 !git/config
 !git/ignore
+
+!install/
+install/*
+!install/install.sh
+!install/packages.txt
+!install/geforcenow.gpg
