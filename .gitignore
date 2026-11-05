@@ -36,3 +36,8 @@ noctalia/palettes/*
 nvim/*
 !nvim/init.lua
 !nvim/nvim-pack-lock.json
+
+!git/
+git/*
+!git/config
+!git/ignore

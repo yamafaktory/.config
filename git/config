@@ -1,0 +1,27 @@
+[user]
+    name = Davy Duperron
+    email = yamafaktory@gmail.com 
+    signingkey = 0DFDD9FEFF92EA2F
+
+[commit]
+    gpgsign = true
+    verbose = true
+
+[init]
+    defaultBranch = main
+
+[merge]
+    conflictStyle = zdiff3
+
+[tag]
+    gpgSign = true
+
+[diff]
+    algorithm = histogram
+
+[includeIf "gitdir:~/cf/"]
+    path = ~/cf/.gitconfig
+
+[includeIf "gitdir:~/dev/"]
+    path = ~/dev/.gitconfig
+
