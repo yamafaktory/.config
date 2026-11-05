@@ -19,10 +19,20 @@ The `.gitignore` ignores everything by default. It lets through each tracked fil
 
 ## Set up a fresh CachyOS install
 
-1. Clone the repo into `~/.config`:
+1. Turn the existing `~/.config` into a checkout of the repo. A fresh install has no SSH key yet, so fetch over HTTPS:
 
    ```sh
-   git clone git@github.com:yamafaktory/.config.git ~/.config
+   cd ~/.config
+   git init -b main
+   git remote add origin https://github.com/yamafaktory/.config.git
+   git fetch origin
+   git checkout -f main
+   ```
+
+   `git checkout -f` replaces the installer's versions of the tracked files. After you restore `~/.ssh`, switch the remote to SSH:
+
+   ```sh
+   git remote set-url origin git@github.com:yamafaktory/.config.git
    ```
 
 2. Preview the install, then run it:
