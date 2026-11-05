@@ -26,8 +26,8 @@ mapfile -t packages < "$here/packages.txt"
 run paru -S --needed "${packages[@]}"
 
 run flatpak remote-add --user --if-not-exists flathub /usr/share/flatpak/remotes.d/flathub.flatpakrepo
-run flatpak remote-add --user --if-not-exists --gpg-import="$here/geforcenow.gpg" \
-  GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow_repo
+run flatpak remote-add --user --if-not-exists \
+  GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo
 run flatpak install --user --noninteractive GeForceNOW com.nvidia.geforcenow
 run flatpak override --user \
   --env=__NV_PRIME_RENDER_OFFLOAD=1 \

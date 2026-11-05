@@ -42,4 +42,3 @@ git/*
 install/*
 !install/install.sh
 !install/packages.txt
-!install/geforcenow.gpg
