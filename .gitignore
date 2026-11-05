@@ -4,10 +4,6 @@
 # Whitelist some files.
 !.gitignore
 
-!atuin/
-atuin/*
-!atuin/config.toml
-
 !bat/
 bat/*
 !bat/config
