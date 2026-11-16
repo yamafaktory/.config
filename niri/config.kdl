@@ -276,5 +276,6 @@ binds {
 
     // ────────────── Noctalia ──────────────
     spawn-at-startup "noctalia"
+    spawn-at-startup "shelly-notifications" // Update notifier (replaces cachy-update)
 
     include "./noctalia.kdl"

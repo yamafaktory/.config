@@ -23,7 +23,13 @@ run() {
 }
 
 mapfile -t packages < "$here/packages.txt"
-run paru -S --needed "${packages[@]}"
+run shelly install standard --needed "${packages[@]}"
+
+# The AUR builds need cargo, and rustup ships without a default toolchain.
+run rustup default stable
+
+mapfile -t aur_packages < "$here/aur.txt"
+run shelly install aur --needed "${aur_packages[@]}"
 
 run flatpak remote-add --user --if-not-exists flathub /usr/share/flatpak/remotes.d/flathub.flatpakrepo
 run flatpak remote-add --user --if-not-exists \
@@ -39,5 +45,3 @@ run sudo systemctl enable --now docker.socket docker.service
 if ! id -nG "$USER" | grep -qw docker; then
   run sudo usermod -aG docker "$USER"
 fi
-
-run systemctl --user enable --now arch-update.timer

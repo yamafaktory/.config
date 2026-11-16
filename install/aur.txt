@@ -1,0 +1,5 @@
+acli-bin
+elan-lean
+google-chrome
+rtk
+zvm

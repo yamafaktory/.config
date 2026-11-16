@@ -208,7 +208,7 @@ vim.keymap.set(
 -- Treesitter: syntax highlighting and parser management.
 -- The new nvim-treesitter (main branch) only installs parsers; highlighting
 -- must be enabled explicitly per buffer via vim.treesitter.start().
--- Requires the tree-sitter CLI for compilation (paru -S tree-sitter-cli).
+-- Requires the tree-sitter CLI for compilation (shelly install standard tree-sitter-cli).
 --]]
 
 -- Enable treesitter highlighting and indentation for any filetype that has

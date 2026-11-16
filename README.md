@@ -44,10 +44,10 @@ The `.gitignore` ignores everything by default. It lets through each tracked fil
 
 The script does four things:
 
-- It installs the packages in `install/packages.txt` with `paru`. The list holds what I add on top of the CachyOS installer, repo and AUR packages together.
+- It installs what I add on top of the CachyOS installer with `shelly`: repo packages from `install/packages.txt`, AUR packages from `install/aur.txt`.
 - It adds NVIDIA's GeForce NOW Flatpak remote and installs the app.
 - It starts GeForce NOW on the NVIDIA GPU, through a Flatpak override.
-- It enables Docker, adds my user to the `docker` group and enables the arch-update timer.
+- It enables Docker and adds my user to the `docker` group.
 
 A second run changes nothing.
 
