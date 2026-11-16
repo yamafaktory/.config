@@ -64,6 +64,17 @@ function claude-cf
     CLAUDE_CONFIG_DIR=~/.claude-cf claude $argv
 end
 alias tower ~/.claude-cf/bin/tower
+function tower-view
+    if not curl -s -o /dev/null http://127.0.0.1:8765/
+        ~/.claude-cf/bin/towergraph view >/dev/null 2>&1 &
+        disown
+        for i in (seq 50)
+            curl -s -o /dev/null http://127.0.0.1:8765/; and break
+            sleep 0.2
+        end
+    end
+    xdg-open http://127.0.0.1:8765
+end
 
 # Rose Pine Moon theme for fish
 # https://rosepinetheme.com
