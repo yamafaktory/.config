@@ -29,6 +29,7 @@ nodejs
 npm
 openai-codex
 opentofu
+polkit-kde-agent
 postgresql-libs
 pre-commit
 python-pytest
