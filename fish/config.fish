@@ -55,10 +55,6 @@ function key_unlock
     end
 end
 
-if status is-interactive; and isatty stdin
-    key_unlock
-end
-
 # Claude
 function claude-cf
     CLAUDE_CONFIG_DIR=~/.claude-cf claude $argv
@@ -117,3 +113,7 @@ set -g fish_color_rose ea9a97
 set -g fish_color_pine 3e8fb0
 set -g fish_color_foam 9ccfd8
 set -g fish_color_iris c4a7e7
+
+if status is-interactive; and isatty stdin
+    key_unlock
+end
